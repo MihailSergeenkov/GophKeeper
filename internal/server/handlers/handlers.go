@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 
 	"go.uber.org/zap/zapcore"
 )

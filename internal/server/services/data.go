@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // FetchUserData функция для получения базовой информации о данных пользователя.

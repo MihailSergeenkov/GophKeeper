@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/services/mocks"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
 	"github.com/golang/mock/gomock"

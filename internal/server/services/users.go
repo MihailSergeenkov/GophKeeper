@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgconn"

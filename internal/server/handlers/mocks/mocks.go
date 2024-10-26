@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	models "github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	models "github.com/MihailSergeenkov/GophKeeper/internal/models"
 	gomock "github.com/golang/mock/gomock"
 	zapcore "go.uber.org/zap/zapcore"
 )

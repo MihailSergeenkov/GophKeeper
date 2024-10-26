@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/services"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -35,7 +35,7 @@ func (h *Handlers) AddCard() http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 
 		enc := json.NewEncoder(w)
-		if err := enc.Encode(models.UserData{ID: id}); err != nil {
+		if err := enc.Encode(models.AddResponse{ID: id}); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			h.logger.Error(encRespErrStr, zap.Error(err))
 			return

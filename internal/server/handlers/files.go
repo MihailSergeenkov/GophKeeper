@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/services"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -48,7 +49,7 @@ func (h *Handlers) AddFile() http.HandlerFunc {
 		w.WriteHeader(http.StatusCreated)
 
 		enc := json.NewEncoder(w)
-		if err := enc.Encode(models.UserData{ID: id}); err != nil {
+		if err := enc.Encode(models.AddResponse{ID: id}); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			h.logger.Error(encRespErrStr, zap.Error(err))
 			return
@@ -78,19 +79,18 @@ func (h *Handlers) GetFile() http.HandlerFunc {
 			h.logger.Error("failed to get file", zap.Error(err))
 			return
 		}
-		// defer file.File.Close()
+		defer file.File.Close()
 
-		// fileBytes, err := io.ReadAll(file.File)
-		// if err != nil {
-		// 	w.WriteHeader(http.StatusInternalServerError)
-		// 	h.logger.Error("failed to prepare file", zap.Error(err))
-		// 	return
-		// }
+		fileBytes, err := io.ReadAll(file.File)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			h.logger.Error("failed to prepare file", zap.Error(err))
+			return
+		}
 
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.WriteHeader(http.StatusOK)
 
-		// w.Write(fileBytes)
-		w.Write(file.FileBytes)
+		w.Write(fileBytes)
 	}
 }

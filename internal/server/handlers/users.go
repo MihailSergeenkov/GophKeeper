@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/services"
 	"go.uber.org/zap"
 )

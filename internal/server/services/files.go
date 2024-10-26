@@ -1,15 +1,13 @@
 package services
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
 )
 
@@ -21,13 +19,7 @@ func (s *Services) AddFile(ctx context.Context, req models.AddFileRequest) (int,
 		return 0, fmt.Errorf("failed to validate fields %w", err)
 	}
 
-	// не работает
-	f, _ := io.ReadAll(req.File)
-	encFile := s.crypter.EncryptData(f)
-	log.Print(encFile)
-	//
-
-	if err := s.fileStorage.AddFile(ctx, bytes.NewReader(encFile), req.FileName, req.FileSize); err != nil {
+	if err := s.fileStorage.AddFile(ctx, req.File, req.FileName, req.FileSize); err != nil {
 		return 0, fmt.Errorf("failed to add file to filestorage %w", err)
 	}
 
@@ -78,18 +70,7 @@ func (s *Services) GetFile(ctx context.Context, id int) (models.File, error) {
 		return resp, fmt.Errorf("failed to get file from filestorage %w", err)
 	}
 
-	// не работает
-	f, _ := io.ReadAll(file)
-	log.Print(f) // видно что возвращается из стора усеченное кол-во байт
-	defer file.Close()
-	decFile, err := s.crypter.DecryptData(f)
-	if err != nil {
-		return resp, fmt.Errorf("failed to decrypt file %w", err)
-	}
-	//
-
-	// resp.File = file
-	resp.FileBytes = decFile
+	resp.File = file
 
 	return resp, nil
 }

@@ -9,7 +9,7 @@ import (
 	io "io"
 	reflect "reflect"
 
-	models "github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	models "github.com/MihailSergeenkov/GophKeeper/internal/models"
 	gomock "github.com/golang/mock/gomock"
 )
 

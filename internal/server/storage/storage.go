@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/constants"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"

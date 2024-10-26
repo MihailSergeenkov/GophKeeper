@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/routes/mocks"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
 	"github.com/golang-jwt/jwt/v5"

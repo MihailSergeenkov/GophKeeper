@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -9,10 +8,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/server/config"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/handlers/mocks"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
+	"github.com/MihailSergeenkov/GophKeeper/internal/server/routes"
+	rMocks "github.com/MihailSergeenkov/GophKeeper/internal/server/routes/mocks"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/services"
-	"github.com/go-chi/chi"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -139,7 +140,15 @@ func TestGetText(t *testing.T) {
 	l := mocks.NewMockLogger(mockCtrl)
 	handlers := NewHandlers(s, l)
 
+	settings, err := config.Setup(false)
+	require.NoError(t, err)
+	storage := rMocks.NewMockStorager(mockCtrl)
+
 	textID := 1
+
+	r := routes.NewRouter(handlers, settings, zap.NewNop(), storage)
+	ts := httptest.NewServer(r)
+	defer ts.Close()
 
 	type serviceResponse struct {
 		res models.Text
@@ -210,39 +219,11 @@ func TestGetText(t *testing.T) {
 				Return(test.serviceResponse.res, test.serviceResponse.err)
 
 			l.EXPECT().Error(test.want.log, zap.Error(test.serviceResponse.err)).Times(test.want.errorLogTimes)
+			storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-			// r := chi.NewRouter()
-			// r.Get("/api/user/texts/{textID}", handlers.GetText())
-			// ts := httptest.NewServer(r)
-			// defer ts.Close()
-
-			request := httptest.NewRequest(http.MethodGet, "/api/user/texts/1", http.NoBody)
-			// request, _ := http.NewRequest(http.MethodGet, ts.URL+"/api/user/texts/1", http.NoBody)
-			w := httptest.NewRecorder()
-
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("textID", "1")
-			request = request.WithContext(context.WithValue(request.Context(), chi.RouteCtxKey, rctx))
-
-			// ctx := context.Background()
-			// ctx = context.WithValue(rctx, "sdf", "df")
-
-			// request := httptest.NewRequestWithContext(context.WithValue(context.Background(), chi.RouteCtxKey, rctx), http.MethodGet, "/api/user/texts/1", http.NoBody)
-
-			handlers.GetText()(w, request)
-
-			res := w.Result()
-			defer closeBody(t, res)
-			// res, err := http.DefaultClient.Do(request)
-			// require.NoError(t, err)
-
+			res, resBody := testRequest(t, ts, http.MethodGet, "/api/user/texts/1")
 			assert.Equal(t, test.want.code, res.StatusCode)
-
-			if http.StatusOK == res.StatusCode {
-				resBody, err := io.ReadAll(res.Body)
-				require.NoError(t, err)
-				assert.Equal(t, test.want.body, string(resBody))
-			}
+			assert.Equal(t, test.want.body, resBody)
 		})
 	}
 }
@@ -255,22 +236,39 @@ func TestGetTextFailedReadParam(t *testing.T) {
 	l := mocks.NewMockLogger(mockCtrl)
 	handlers := NewHandlers(s, l)
 
+	settings, err := config.Setup(false)
+	require.NoError(t, err)
+	storage := rMocks.NewMockStorager(mockCtrl)
+
+	r := routes.NewRouter(handlers, settings, zap.NewNop(), storage)
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
 	t.Run("failed to read request param", func(t *testing.T) {
 		s.EXPECT().GetText(gomock.Any(), gomock.Any()).Times(0)
 		l.EXPECT().Error("failed ID param", gomock.Any()).Times(1)
+		storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-		request := httptest.NewRequest(http.MethodGet, "/api/user/texts", http.NoBody)
-		w := httptest.NewRecorder()
-
-		rctx := chi.NewRouteContext()
-		rctx.URLParams.Add("textID", "adasd")
-		request = request.WithContext(context.WithValue(request.Context(), chi.RouteCtxKey, rctx))
-
-		handlers.GetText()(w, request)
-
-		res := w.Result()
-		defer closeBody(t, res)
-
+		res, _ := testRequest(t, ts, http.MethodGet, "/api/user/texts/adasd")
 		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 	})
+}
+
+func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
+	req, err := http.NewRequest(method, ts.URL+path, http.NoBody)
+	require.NoError(t, err)
+
+	req.Header.Add(
+		"X-Auth-Token",
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjF9.Glkq00DHorJbUkJxeD4TDfA9zqxFLWtfYiqCVfVUe9U",
+	)
+
+	resp, err := ts.Client().Do(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	return resp, string(respBody)
 }

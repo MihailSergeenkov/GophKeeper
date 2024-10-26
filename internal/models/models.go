@@ -36,12 +36,17 @@ type Claims struct {
 	UserID int
 }
 
+// AddResponse тип для ответа добавленния данных.
+type AddResponse struct {
+	ID int `json:"id"`
+}
+
 // UserData тип для данных пользователя.
 type UserData struct {
 	ID          int    `json:"id"`
-	Mark        string `json:"mark,omitempty"`
-	Description string `json:"description,omitempty"`
-	Type        string `json:"type,omitempty"`
+	Mark        string `json:"mark"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
 }
 
 // AddPasswordRequest тип для добавления пароля пользователя.
@@ -108,8 +113,7 @@ type Text struct {
 
 // File тип для файла пользователя.
 type File struct {
-	File      io.ReadCloser
-	FileBytes []byte // специально для теста
+	File io.ReadCloser
 }
 
 // EncryptPasswordData тип для шифрованных данных пароля пользователя.

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"io"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
 )
 
 var (

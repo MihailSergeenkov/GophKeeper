@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/server/models"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
