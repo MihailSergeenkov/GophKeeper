@@ -49,7 +49,6 @@ func testGetRequest(t *testing.T, ts *httptest.Server, path string) (*http.Respo
 
 	resp, err := ts.Client().Do(req)
 	require.NoError(t, err)
-	closeBody(t, resp)
 
 	respBody, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)

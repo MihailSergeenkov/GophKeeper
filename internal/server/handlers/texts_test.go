@@ -180,7 +180,7 @@ func TestGetText(t *testing.T) {
 			},
 			want: want{
 				code:          http.StatusOK,
-				body:          "{\"id\":1,\"data\":\"test\",\"mark\":\"test\",\"description\":\"test\"}\n",
+				body:          "{\"data\":\"test\",\"mark\":\"test\",\"description\":\"test\",\"id\":1}\n",
 				errorLogTimes: 0,
 				log:           "",
 			},
@@ -221,7 +221,9 @@ func TestGetText(t *testing.T) {
 			l.EXPECT().Error(test.want.log, zap.Error(test.serviceResponse.err)).Times(test.want.errorLogTimes)
 			storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-			res, resBody := testGetRequest(t, ts, "/api/user/texts/1") //nolint:bodyclose // закрывается внутри
+			res, resBody := testGetRequest(t, ts, "/api/user/texts/1")
+			closeBody(t, res)
+
 			assert.Equal(t, test.want.code, res.StatusCode)
 			assert.Equal(t, test.want.body, resBody)
 		})
@@ -246,10 +248,12 @@ func TestGetTextFailedReadParam(t *testing.T) {
 
 	t.Run("failed to read request param", func(t *testing.T) {
 		s.EXPECT().GetText(gomock.Any(), gomock.Any()).Times(0)
-		l.EXPECT().Error("failed ID param", gomock.Any()).Times(1)
+		l.EXPECT().Error("failed text ID param", gomock.Any()).Times(1)
 		storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-		res, _ := testGetRequest(t, ts, "/api/user/texts/adasd") //nolint:bodyclose // закрывается внутри
+		res, _ := testGetRequest(t, ts, "/api/user/texts/adasd")
+		closeBody(t, res)
+
 		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 	})
 }

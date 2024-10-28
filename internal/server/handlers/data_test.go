@@ -59,7 +59,7 @@ func TestFetchUserData(t *testing.T) {
 			want: want{
 				code:          http.StatusOK,
 				contentType:   JSONContentType,
-				body:          "[{\"id\":1,\"mark\":\"Mark\",\"description\":\"Description\",\"type\":\"card\"}]\n",
+				body:          "[{\"mark\":\"Mark\",\"description\":\"Description\",\"type\":\"card\",\"id\":1}]\n",
 				errorLogTimes: 0,
 				log:           "",
 			},
