@@ -37,7 +37,7 @@ func (m *MockServicer) EXPECT() *MockServicerMockRecorder {
 }
 
 // AddCard mocks base method.
-func (m *MockServicer) AddCard(ctx context.Context, req models.AddCardRequest) (int, error) {
+func (m *MockServicer) AddCard(ctx context.Context, req *models.AddCardRequest) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddCard", ctx, req)
 	ret0, _ := ret[0].(int)

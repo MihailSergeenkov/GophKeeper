@@ -13,10 +13,10 @@ func TestSetup(t *testing.T) {
 	runAddr := "localhost:8081"
 
 	tests := []struct {
-		name    string
 		setEnv  func()
-		wantErr bool
+		name    string
 		errText string
+		wantErr bool
 	}{
 		{
 			name: "success setup",

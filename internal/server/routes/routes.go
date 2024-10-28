@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// Storager интерфейс для обработчиков HTTP запросов приложения.
+// Handlerer интерфейс для обработчиков HTTP запросов приложения.
 type Handlerer interface {
 	Ping() http.HandlerFunc
 	RegisterUser() http.HandlerFunc

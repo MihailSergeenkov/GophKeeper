@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
@@ -17,12 +16,17 @@ var (
 	ErrUserOwnerIsTooBig     = errors.New("user owner is too big")
 	ErrUserExpiryDateInvalid = errors.New("user expiry date invalid")
 	ErrUserCVV2Invalid       = errors.New("user cvv2 invalid")
+
+	cardNumberSize     = 16
+	cardOwnerMaxSize   = 100
+	cardExpiryDateSize = 7
+	cardCVV2Size       = 3
 )
 
 // AddCard функция для добавления карты пользователя.
-func (s *Services) AddCard(ctx context.Context, req models.AddCardRequest) (int, error) {
+func (s *Services) AddCard(ctx context.Context, req *models.AddCardRequest) (int, error) {
 	if err := validateAddCardRequest(req); err != nil {
-		return 0, fmt.Errorf("failed to validate fields %w", err)
+		return 0, failedValidateFields(err)
 	}
 
 	data := models.EncryptCardData{
@@ -33,14 +37,14 @@ func (s *Services) AddCard(ctx context.Context, req models.AddCardRequest) (int,
 	}
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		return 0, fmt.Errorf("failed to generate json data %w", err)
+		return 0, failedGenerateJSONData(err)
 	}
 
 	encData := s.crypter.EncryptData(jsonData)
 
 	id, err := s.storage.AddUserData(ctx, encData, req.Mark, req.Description, cardDataType)
 	if err != nil {
-		return 0, fmt.Errorf("failed to add user data %w", err)
+		return 0, failedAddUserData(err)
 	}
 
 	return id, nil
@@ -56,18 +60,18 @@ func (s *Services) GetCard(ctx context.Context, id int) (models.Card, error) {
 			return resp, ErrNotFound
 		}
 
-		return resp, fmt.Errorf("failed to get user data %w", err)
+		return resp, failedGetUserData(err)
 	}
 
 	jsonData, err := s.crypter.DecryptData(decData)
 	if err != nil {
-		return resp, fmt.Errorf("failed to decrypt data %w", err)
+		return resp, failedDecryptData(err)
 	}
 
 	var encData models.EncryptCardData
 
 	if err = json.Unmarshal(jsonData, &encData); err != nil {
-		return resp, fmt.Errorf("failed to generate data %w", err)
+		return resp, failedGenerateData(err)
 	}
 
 	resp.ID = id
@@ -81,23 +85,23 @@ func (s *Services) GetCard(ctx context.Context, id int) (models.Card, error) {
 	return resp, nil
 }
 
-func validateAddCardRequest(req models.AddCardRequest) error {
-	if len(req.Number) != 16 {
+func validateAddCardRequest(req *models.AddCardRequest) error {
+	if len(req.Number) != cardNumberSize {
 		return ErrUserNumberInvalid
 	}
-	if len(req.Owner) > 100 {
+	if len(req.Owner) > cardOwnerMaxSize {
 		return ErrUserOwnerIsTooBig
 	}
-	if len(req.ExpiryDate) != 7 {
+	if len(req.ExpiryDate) != cardExpiryDateSize {
 		return ErrUserExpiryDateInvalid
 	}
-	if len(req.CVV2) != 3 {
+	if len(req.CVV2) != cardCVV2Size {
 		return ErrUserCVV2Invalid
 	}
-	if len([]rune(req.Mark)) > 50 {
+	if len([]rune(req.Mark)) > maxMarkSize {
 		return ErrUserMarkIsTooBig
 	}
-	if len([]rune(req.Description)) > 50 {
+	if len([]rune(req.Description)) > maxDescriptionSize {
 		return ErrUserDescriptionIsTooBig
 	}
 

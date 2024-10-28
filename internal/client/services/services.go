@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -32,4 +33,24 @@ func getClient(cfg Configurer) *resty.Client {
 		New().
 		SetTimeout(time.Duration(cfg.GetRequestTimeout()) * time.Second).
 		SetRetryCount(cfg.GetRequestRetry())
+}
+
+// failedRequest обертка ошибки запроса.
+func failedRequest(err error) error {
+	return fmt.Errorf("failed request: %w", err)
+}
+
+// failedResponseStatus обертка ошибки неправильного статуса.
+func failedResponseStatus(status string) error {
+	return fmt.Errorf("response status: %s", status)
+}
+
+// failedCreateBody обертка ошибки генерации тела запроса.
+func failedCreateBody(err error) error {
+	return fmt.Errorf("failed to create body: %w", err)
+}
+
+// failedDumpData обертка ошибки кеширования данных.
+func failedDumpData(err error) error {
+	return fmt.Errorf("failed to dump data: %w", err)
 }

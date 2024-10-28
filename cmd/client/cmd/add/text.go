@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// textCmd represents the text command
+// textCmd represents the text command.
 var textCmd = &cobra.Command{
 	Use:   "text",
 	Short: "Загрузить текстовые данные",
@@ -18,8 +18,8 @@ var textCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		text, _ := cmd.Flags().GetString("text")
-		mark, _ := cmd.Flags().GetString("mark")
-		description, _ := cmd.Flags().GetString("description")
+		mark, _ := cmd.Flags().GetString(markFlag)
+		description, _ := cmd.Flags().GetString(descriptionFlag)
 
 		req := models.AddTextRequest{
 			Data:        text,
@@ -28,7 +28,7 @@ var textCmd = &cobra.Command{
 		}
 
 		if err := services.AddText(config.GetConfig(), req); err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
@@ -40,5 +40,8 @@ func init() {
 	addCmd.AddCommand(textCmd)
 
 	textCmd.Flags().StringP("text", "t", "", "Текст для сохранения")
-	textCmd.MarkFlagRequired("text")
+	if err := textCmd.MarkFlagRequired("text"); err != nil {
+		printFailed(err)
+		os.Exit(1)
+	}
 }

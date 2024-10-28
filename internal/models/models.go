@@ -43,10 +43,10 @@ type AddResponse struct {
 
 // UserData тип для данных пользователя.
 type UserData struct {
-	ID          int    `json:"id"`
 	Mark        string `json:"mark"`
 	Description string `json:"description"`
 	Type        string `json:"type"`
+	ID          int    `json:"id"`
 }
 
 // AddPasswordRequest тип для добавления пароля пользователя.
@@ -78,37 +78,37 @@ type AddTextRequest struct {
 type AddFileRequest struct {
 	File        io.Reader
 	FileName    string
-	FileSize    int64
 	Mark        string
 	Description string
+	FileSize    int64
 }
 
 // Password тип для пароля пользователя.
 type Password struct {
-	ID          int    `json:"id"`
 	Login       string `json:"login"`
 	Password    string `json:"password"`
 	Mark        string `json:"mark"`
 	Description string `json:"description"`
+	ID          int    `json:"id"`
 }
 
 // Card тип для карты пользователя.
 type Card struct {
-	ID          int    `json:"id"`
 	Number      string `json:"number"`
 	Owner       string `json:"owner"`
 	ExpiryDate  string `json:"expiry_date"`
 	CVV2        string `json:"cvv2"`
 	Mark        string `json:"mark"`
 	Description string `json:"description"`
+	ID          int    `json:"id"`
 }
 
 // Text тип для текста пользователя.
 type Text struct {
-	ID          int    `json:"id"`
 	Data        string `json:"data"`
 	Mark        string `json:"mark"`
 	Description string `json:"description"`
+	ID          int    `json:"id"`
 }
 
 // File тип для файла пользователя.

@@ -223,7 +223,7 @@ func TestGetPassword(t *testing.T) {
 			l.EXPECT().Error(test.want.log, zap.Error(test.serviceResponse.err)).Times(test.want.errorLogTimes)
 			storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-			res, resBody := testRequest(t, ts, http.MethodGet, "/api/user/passwords/1")
+			res, resBody := testGetRequest(t, ts, "/api/user/passwords/1") //nolint:bodyclose // закрывается внутри
 			assert.Equal(t, test.want.code, res.StatusCode)
 			assert.Equal(t, test.want.body, resBody)
 		})
@@ -251,7 +251,7 @@ func TestGetPasswordFailedReadParam(t *testing.T) {
 		l.EXPECT().Error("failed ID param", gomock.Any()).Times(1)
 		storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-		res, _ := testRequest(t, ts, http.MethodGet, "/api/user/passwords/adasd")
+		res, _ := testGetRequest(t, ts, "/api/user/passwords/adasd") //nolint:bodyclose // закрывается внутри
 		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 	})
 }

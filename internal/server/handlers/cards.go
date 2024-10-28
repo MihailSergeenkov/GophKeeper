@@ -24,7 +24,7 @@ func (h *Handlers) AddCard() http.HandlerFunc {
 			return
 		}
 
-		id, err := h.services.AddCard(r.Context(), req)
+		id, err := h.services.AddCard(r.Context(), &req)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			h.logger.Error("failed to add card", zap.Error(err))
@@ -50,7 +50,7 @@ func (h *Handlers) GetCard() http.HandlerFunc {
 		cardID, err := strconv.Atoi(id)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			h.logger.Error("failed ID param", zap.Error(err))
+			h.logger.Error("failed card ID param", zap.Error(err))
 			return
 		}
 

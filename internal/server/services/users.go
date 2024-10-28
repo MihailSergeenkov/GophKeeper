@@ -24,7 +24,7 @@ var (
 // RegisterUser зарегистрировать нового пользователя.
 func (s *Services) RegisterUser(ctx context.Context, req models.RegisterUserRequest) error {
 	if err := validateRegisterUserRequest(req); err != nil {
-		return fmt.Errorf("failed to validate fields %w", err)
+		return failedValidateFields(err)
 	}
 
 	hashedPassword, err := hashPassword(req.Password)

@@ -71,7 +71,7 @@ func TestAddCard(t *testing.T) {
 				AddUserData(ctx, encData, req.Mark, req.Description, dataType).
 				Times(1).Return(test.sResponse.id, test.sResponse.err)
 
-			id, err := s.AddCard(ctx, req)
+			id, err := s.AddCard(ctx, &req)
 
 			if test.wantErr {
 				require.Error(t, err)
@@ -212,7 +212,7 @@ func TestAddCardValidationFailed(t *testing.T) {
 			crypter.EXPECT().EncryptData(gomock.Any()).Times(0)
 			store.EXPECT().AddUserData(ctx, gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
 
-			_, err := s.AddCard(ctx, test.arg.req)
+			_, err := s.AddCard(ctx, &test.arg.req)
 
 			require.Error(t, err)
 			assert.ErrorContains(t, err, test.want.err.Error())

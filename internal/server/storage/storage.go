@@ -218,7 +218,7 @@ func (s *Storage) AddUserData(
 	return id, nil
 }
 
-// AddUserData получить данные пользователя.
+// GetUserData получить данные пользователя.
 func (s *Storage) GetUserData(ctx context.Context, id int, dataType string) ([]byte, string, string, error) {
 	const query = `
 		SELECT data, mark, description FROM user_data 

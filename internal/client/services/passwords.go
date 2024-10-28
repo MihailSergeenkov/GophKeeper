@@ -2,7 +2,7 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -15,7 +15,7 @@ func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
 
 	body, err := json.Marshal(req)
 	if err != nil {
-		return fmt.Errorf("failed to create body: %w", err)
+		return failedCreateBody(err)
 	}
 
 	addResp := models.AddResponse{}
@@ -28,10 +28,10 @@ func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
 		Post(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusCreated {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
 	d := models.UserData{
@@ -42,7 +42,7 @@ func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
 	}
 
 	if err := cfg.AddData(d); err != nil {
-		return fmt.Errorf("failed to dump data: %w", err)
+		return failedDumpData(err)
 	}
 
 	return nil
@@ -55,7 +55,7 @@ func GetPassword(cfg Configurer, id string) (models.Password, error) {
 	password := models.Password{}
 
 	if _, ok := cfg.GetData()[id]; !ok {
-		return password, fmt.Errorf("password id not found")
+		return password, errors.New("password id not found")
 	}
 
 	client := getClient(cfg)
@@ -67,10 +67,10 @@ func GetPassword(cfg Configurer, id string) (models.Password, error) {
 		Get(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return password, fmt.Errorf("failed request: %w", err)
+		return password, failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		return password, fmt.Errorf("response status: %s", resp.Status())
+		return password, failedResponseStatus(resp.Status())
 	}
 
 	return password, nil

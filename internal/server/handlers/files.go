@@ -16,7 +16,7 @@ import (
 // AddFile обработчик для добавления файла пользователя.
 func (h *Handlers) AddFile() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if err := r.ParseMultipartForm(10 << 20); err != nil {
+		if err := r.ParseMultipartForm(10 << 20); err != nil { //nolint:gomnd // так нагляднее
 			w.WriteHeader(http.StatusInternalServerError)
 			h.logger.Error("failed to add file", zap.Error(err))
 			return
@@ -28,7 +28,11 @@ func (h *Handlers) AddFile() http.HandlerFunc {
 			h.logger.Error("failed to retrieving the file", zap.Error(err))
 			return
 		}
-		defer file.Close()
+		defer func() {
+			if err := file.Close(); err != nil {
+				h.logger.Error("failed to close file", zap.Error(err))
+			}
+		}()
 
 		req := models.AddFileRequest{
 			Mark:        r.PostFormValue("mark"),
@@ -64,7 +68,7 @@ func (h *Handlers) GetFile() http.HandlerFunc {
 		fileID, err := strconv.Atoi(id)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			h.logger.Error("failed ID param", zap.Error(err))
+			h.logger.Error("failed file ID param", zap.Error(err))
 			return
 		}
 
@@ -79,7 +83,11 @@ func (h *Handlers) GetFile() http.HandlerFunc {
 			h.logger.Error("failed to get file", zap.Error(err))
 			return
 		}
-		defer file.File.Close()
+		defer func() {
+			if err := file.File.Close(); err != nil {
+				h.logger.Error("failed to close file", zap.Error(err))
+			}
+		}()
 
 		fileBytes, err := io.ReadAll(file.File)
 		if err != nil {
@@ -91,6 +99,10 @@ func (h *Handlers) GetFile() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.WriteHeader(http.StatusOK)
 
-		w.Write(fileBytes)
+		if _, err := w.Write(fileBytes); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			h.logger.Error("failed to write file data", zap.Error(err))
+			return
+		}
 	}
 }

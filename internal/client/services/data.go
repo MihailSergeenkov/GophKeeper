@@ -21,14 +21,16 @@ func SyncData(cfg Configurer) error {
 		Get(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 
 	if resp.StatusCode() != http.StatusOK && resp.StatusCode() != http.StatusNoContent {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
-	cfg.UpdateData(userData)
+	if err := cfg.UpdateData(userData); err != nil {
+		return fmt.Errorf("failed to update data: %w", err)
+	}
 	return nil
 }
 

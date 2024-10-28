@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// passwordCmd represents the password command
+// passwordCmd represents the password command.
 var passwordCmd = &cobra.Command{
 	Use:   "password",
 	Short: "Загрузить данные логин-пароля",
@@ -19,8 +19,8 @@ var passwordCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		login, _ := cmd.Flags().GetString("login")
 		password, _ := cmd.Flags().GetString("password")
-		mark, _ := cmd.Flags().GetString("mark")
-		description, _ := cmd.Flags().GetString("description")
+		mark, _ := cmd.Flags().GetString(markFlag)
+		description, _ := cmd.Flags().GetString(descriptionFlag)
 
 		req := models.AddPasswordRequest{
 			Login:       login,
@@ -30,7 +30,7 @@ var passwordCmd = &cobra.Command{
 		}
 
 		if err := services.AddPassword(config.GetConfig(), req); err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
@@ -42,7 +42,13 @@ func init() {
 	addCmd.AddCommand(passwordCmd)
 
 	passwordCmd.Flags().StringP("login", "l", "", "Логин для сохранения")
-	passwordCmd.MarkFlagRequired("login")
 	passwordCmd.Flags().StringP("password", "p", "", "Пароль для сохранения")
-	passwordCmd.MarkFlagRequired("password")
+	if err := passwordCmd.MarkFlagRequired("login"); err != nil {
+		printFailed(err)
+		os.Exit(1)
+	}
+	if err := passwordCmd.MarkFlagRequired("password"); err != nil {
+		printFailed(err)
+		os.Exit(1)
+	}
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// cardCmd represents the card command
+// cardCmd represents the card command.
 var cardCmd = &cobra.Command{
 	Use:   "card [ID]",
 	Short: "Получить полные данные банковской карты",
@@ -20,13 +20,13 @@ var cardCmd = &cobra.Command{
 		id := args[0]
 		data, err := services.GetCard(config.GetConfig(), id)
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
 		b, err := json.MarshalIndent(data, "", "  ")
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 

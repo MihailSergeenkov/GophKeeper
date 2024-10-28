@@ -50,7 +50,7 @@ func (h *Handlers) GetText() http.HandlerFunc {
 		textID, err := strconv.Atoi(id)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			h.logger.Error("failed ID param", zap.Error(err))
+			h.logger.Error("failed text ID param", zap.Error(err))
 			return
 		}
 

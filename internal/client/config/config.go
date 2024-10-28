@@ -10,29 +10,34 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	ServerAPI      string `mapstructure:"server_api"`
-	RequestRetry   int    `mapstructure:"request_retry"`
-	RequestTimeout int    `mapstructure:"request_timeout"`
-	Token          string
-	Data           map[string]models.UserData
-}
+const (
+	requestRetryDefault   = 3
+	requestTimeoutDefault = 5
+)
 
 var cfg Config
+
+type Config struct {
+	Data           map[string]models.UserData
+	ServerAPI      string `mapstructure:"server_api"`
+	Token          string
+	RequestRetry   int `mapstructure:"request_retry"`
+	RequestTimeout int `mapstructure:"request_timeout"`
+}
 
 func Initializer(cfgFile *string) func() {
 	return func() {
 		initConfigFile(cfgFile)
 
 		if err := viper.ReadInConfig(); err != nil {
-			if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			if _, ok := err.(viper.ConfigFileNotFoundError); !ok { //nolint:errorlint // Не работает с AS
 				fmt.Println("Can't read config:", err)
 				os.Exit(1)
 			}
 
 			viper.SetDefault("server_api", "http://localhost:8080/api")
-			viper.SetDefault("request_retry", 3)
-			viper.SetDefault("request_timeout", 5)
+			viper.SetDefault("request_retry", requestRetryDefault)
+			viper.SetDefault("request_timeout", requestTimeoutDefault)
 			viper.SetDefault("token", "")
 
 			if err := viper.SafeWriteConfig(); err != nil {

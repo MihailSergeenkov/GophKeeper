@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// fileCmd represents the file command
+// fileCmd represents the file command.
 var fileCmd = &cobra.Command{
 	Use:   "file [ID]",
 	Short: "Получить файл",
@@ -19,7 +19,7 @@ var fileCmd = &cobra.Command{
 		id := args[0]
 		dir, _ := cmd.Flags().GetString("upload-dir")
 		if err := services.GetFile(config.GetConfig(), id, dir); err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 

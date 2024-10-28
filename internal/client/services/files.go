@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -26,10 +26,10 @@ func AddFile(cfg Configurer, filePath, mark, description string) error {
 		Post(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusCreated {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
 	d := models.UserData{
@@ -40,7 +40,7 @@ func AddFile(cfg Configurer, filePath, mark, description string) error {
 	}
 
 	if err := cfg.AddData(d); err != nil {
-		return fmt.Errorf("failed to dump data: %w", err)
+		return failedDumpData(err)
 	}
 
 	return nil
@@ -52,7 +52,7 @@ func GetFile(cfg Configurer, id, dir string) error {
 
 	userData, ok := cfg.GetData()[id]
 	if !ok {
-		return fmt.Errorf("file id not found")
+		return errors.New("file id not found")
 	}
 
 	client := getClient(cfg)
@@ -64,10 +64,10 @@ func GetFile(cfg Configurer, id, dir string) error {
 		Get(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
 	return nil

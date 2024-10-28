@@ -25,7 +25,7 @@ import (
 // 		err := run(ctx, false)
 // 		require.NoError(t, err)
 // 	})
-// }
+// }.
 
 func TestConfigureServer(t *testing.T) {
 	mockCtrl := gomock.NewController(t)

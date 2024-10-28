@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// passwordCmd represents the password command
+// passwordCmd represents the password command.
 var passwordCmd = &cobra.Command{
 	Use:   "password [ID]",
 	Short: "Получить полные данные логин-пароля",
@@ -20,13 +20,13 @@ var passwordCmd = &cobra.Command{
 		id := args[0]
 		data, err := services.GetPassword(config.GetConfig(), id)
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
 		b, err := json.MarshalIndent(data, "", "  ")
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 

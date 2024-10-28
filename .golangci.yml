@@ -55,9 +55,6 @@ linters-settings:
   dupl:
     threshold: 100
 
-  dupword:
-    keywords: []
-
   errcheck:
     check-blank: false
     check-type-assertions: true
@@ -480,7 +477,6 @@ linters:
     - bidichk
     - bodyclose
     - containedctx
-    - dupword
     - durationcheck
     - errcheck
     - errname

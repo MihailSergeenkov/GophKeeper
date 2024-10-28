@@ -2,20 +2,20 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // AddCard сервис добавления данных банковской карты.
-func AddCard(cfg Configurer, req models.AddCardRequest) error {
+func AddCard(cfg Configurer, req *models.AddCardRequest) error {
 	const path = "/user/cards"
 	client := getClient(cfg)
 
 	body, err := json.Marshal(req)
 	if err != nil {
-		return fmt.Errorf("failed to create body: %w", err)
+		return failedCreateBody(err)
 	}
 
 	addResp := models.AddResponse{}
@@ -28,10 +28,10 @@ func AddCard(cfg Configurer, req models.AddCardRequest) error {
 		Post(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusCreated {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
 	d := models.UserData{
@@ -42,7 +42,7 @@ func AddCard(cfg Configurer, req models.AddCardRequest) error {
 	}
 
 	if err := cfg.AddData(d); err != nil {
-		return fmt.Errorf("failed to dump data: %w", err)
+		return failedDumpData(err)
 	}
 
 	return nil
@@ -55,7 +55,7 @@ func GetCard(cfg Configurer, id string) (models.Card, error) {
 	card := models.Card{}
 
 	if _, ok := cfg.GetData()[id]; !ok {
-		return card, fmt.Errorf("card id not found")
+		return card, errors.New("card id not found")
 	}
 
 	client := getClient(cfg)
@@ -67,10 +67,10 @@ func GetCard(cfg Configurer, id string) (models.Card, error) {
 		Get(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return card, fmt.Errorf("failed request: %w", err)
+		return card, failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		return card, fmt.Errorf("response status: %s", resp.Status())
+		return card, failedResponseStatus(resp.Status())
 	}
 
 	return card, nil

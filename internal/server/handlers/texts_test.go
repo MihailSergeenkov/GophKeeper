@@ -221,7 +221,7 @@ func TestGetText(t *testing.T) {
 			l.EXPECT().Error(test.want.log, zap.Error(test.serviceResponse.err)).Times(test.want.errorLogTimes)
 			storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-			res, resBody := testRequest(t, ts, http.MethodGet, "/api/user/texts/1")
+			res, resBody := testGetRequest(t, ts, "/api/user/texts/1") //nolint:bodyclose // закрывается внутри
 			assert.Equal(t, test.want.code, res.StatusCode)
 			assert.Equal(t, test.want.body, resBody)
 		})
@@ -249,26 +249,7 @@ func TestGetTextFailedReadParam(t *testing.T) {
 		l.EXPECT().Error("failed ID param", gomock.Any()).Times(1)
 		storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-		res, _ := testRequest(t, ts, http.MethodGet, "/api/user/texts/adasd")
+		res, _ := testGetRequest(t, ts, "/api/user/texts/adasd") //nolint:bodyclose // закрывается внутри
 		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 	})
-}
-
-func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
-	req, err := http.NewRequest(method, ts.URL+path, http.NoBody)
-	require.NoError(t, err)
-
-	req.Header.Add(
-		"X-Auth-Token",
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjF9.Glkq00DHorJbUkJxeD4TDfA9zqxFLWtfYiqCVfVUe9U",
-	)
-
-	resp, err := ts.Client().Do(req)
-	require.NoError(t, err)
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	require.NoError(t, err)
-
-	return resp, string(respBody)
 }

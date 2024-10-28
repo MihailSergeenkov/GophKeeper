@@ -15,7 +15,7 @@ func RegisterUser(cfg Configurer, req models.RegisterUserRequest) error {
 
 	body, err := json.Marshal(req)
 	if err != nil {
-		return fmt.Errorf("failed to create body: %w", err)
+		return failedCreateBody(err)
 	}
 
 	resp, err := client.R().
@@ -24,10 +24,10 @@ func RegisterUser(cfg Configurer, req models.RegisterUserRequest) error {
 		Post(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
 	return nil
@@ -40,7 +40,7 @@ func LoginUser(cfg Configurer, req models.CreateUserTokenRequest) error {
 
 	body, err := json.Marshal(req)
 	if err != nil {
-		return fmt.Errorf("failed to create body: %w", err)
+		return failedCreateBody(err)
 	}
 
 	userToken := models.CreateUserTokenResponse{}
@@ -52,18 +52,27 @@ func LoginUser(cfg Configurer, req models.CreateUserTokenRequest) error {
 		Post(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
-	cfg.UpdateToken(userToken.AuthToken)
+	if err := cfg.UpdateToken(userToken.AuthToken); err != nil {
+		return fmt.Errorf("failed to update auth token: %w", err)
+	}
 	return nil
 }
 
 // LogoutUser сервис удаления данных пользователя.
-func LogoutUser(cfg Configurer) {
-	cfg.UpdateToken("")
-	cfg.UpdateData([]models.UserData{})
+func LogoutUser(cfg Configurer) error {
+	if err := cfg.UpdateToken(""); err != nil {
+		return fmt.Errorf("failed to update auth token: %w", err)
+	}
+
+	if err := cfg.UpdateData([]models.UserData{}); err != nil {
+		return fmt.Errorf("failed to update data: %w", err)
+	}
+
+	return nil
 }

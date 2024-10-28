@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// textCmd represents the text command
+// textCmd represents the text command.
 var textCmd = &cobra.Command{
 	Use:   "text [ID]",
 	Short: "Получить текст",
@@ -20,13 +20,13 @@ var textCmd = &cobra.Command{
 		id := args[0]
 		data, err := services.GetText(config.GetConfig(), id)
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
 		b, err := json.MarshalIndent(data, "", "  ")
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 

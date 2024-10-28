@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// showCmd represents the show command
+// showCmd represents the show command.
 var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "Показать сохранненную информацию",
@@ -20,7 +20,7 @@ var showCmd = &cobra.Command{
 
 		if sync {
 			if err := services.SyncData(config.GetConfig()); err != nil {
-				fmt.Printf("Failed: %s", err)
+				printFailed(err)
 				os.Exit(1)
 			}
 		}
@@ -29,7 +29,7 @@ var showCmd = &cobra.Command{
 
 		b, err := json.MarshalIndent(userData, "", "  ")
 		if err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 

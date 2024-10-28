@@ -2,7 +2,7 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -15,7 +15,7 @@ func AddText(cfg Configurer, req models.AddTextRequest) error {
 
 	body, err := json.Marshal(req)
 	if err != nil {
-		return fmt.Errorf("failed to create body: %w", err)
+		return failedCreateBody(err)
 	}
 
 	addResp := models.AddResponse{}
@@ -28,10 +28,10 @@ func AddText(cfg Configurer, req models.AddTextRequest) error {
 		Post(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return fmt.Errorf("failed request: %w", err)
+		return failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusCreated {
-		return fmt.Errorf("response status: %s", resp.Status())
+		return failedResponseStatus(resp.Status())
 	}
 
 	d := models.UserData{
@@ -42,7 +42,7 @@ func AddText(cfg Configurer, req models.AddTextRequest) error {
 	}
 
 	if err := cfg.AddData(d); err != nil {
-		return fmt.Errorf("failed to dump data: %w", err)
+		return failedDumpData(err)
 	}
 
 	return nil
@@ -55,7 +55,7 @@ func GetText(cfg Configurer, id string) (models.Text, error) {
 	text := models.Text{}
 
 	if _, ok := cfg.GetData()[id]; !ok {
-		return text, fmt.Errorf("text id not found")
+		return text, errors.New("text id not found")
 	}
 
 	client := getClient(cfg)
@@ -67,10 +67,10 @@ func GetText(cfg Configurer, id string) (models.Text, error) {
 		Get(cfg.GetServerAPI() + path)
 
 	if err != nil {
-		return text, fmt.Errorf("failed request: %w", err)
+		return text, failedRequest(err)
 	}
 	if resp.StatusCode() != http.StatusOK {
-		return text, fmt.Errorf("response status: %s", resp.Status())
+		return text, failedResponseStatus(resp.Status())
 	}
 
 	return text, nil

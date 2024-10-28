@@ -50,7 +50,7 @@ func (h *Handlers) GetPassword() http.HandlerFunc {
 		passwordID, err := strconv.Atoi(id)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			h.logger.Error("failed ID param", zap.Error(err))
+			h.logger.Error("failed password ID param", zap.Error(err))
 			return
 		}
 

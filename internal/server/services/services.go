@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -13,6 +14,9 @@ var (
 	ErrNotFound                = errors.New("requested data no found")
 	ErrUserMarkIsTooBig        = errors.New("user mark is too big")
 	ErrUserDescriptionIsTooBig = errors.New("user description is too big")
+
+	maxMarkSize        = 50
+	maxDescriptionSize = 50
 )
 
 // Services структура для работы с сервисами приложения.
@@ -53,4 +57,34 @@ func NewServices(storage Storager, fileStorage FileStorager, crypter Crypter, se
 		crypter:     crypter,
 		settings:    settings,
 	}
+}
+
+// failedValidateFieldsv оберта ошибки валидации.
+func failedValidateFields(err error) error {
+	return fmt.Errorf("failed to validate fields %w", err)
+}
+
+// failedGenerateJSONData оберта ошибки генерации json.
+func failedGenerateJSONData(err error) error {
+	return fmt.Errorf("failed to generate json data %w", err)
+}
+
+// failedAddUserData оберта ошибки добавления данных пользователя.
+func failedAddUserData(err error) error {
+	return fmt.Errorf("failed to add user data %w", err)
+}
+
+// failedGetUserData оберта ошибки получения данных пользователя.
+func failedGetUserData(err error) error {
+	return fmt.Errorf("failed to get user data %w", err)
+}
+
+// failedDecryptData оберта ошибки расшифрования данных пользователя.
+func failedDecryptData(err error) error {
+	return fmt.Errorf("failed to decrypt data %w", err)
+}
+
+// failedGenerateData оберта ошибки генерации данных пользователя.
+func failedGenerateData(err error) error {
+	return fmt.Errorf("failed to generate data %w", err)
 }

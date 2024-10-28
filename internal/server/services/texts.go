@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
@@ -12,12 +11,16 @@ import (
 
 const textDataType = "text"
 
-var ErrUserTextDataIsTooBig = errors.New("user text data is too big")
+var (
+	ErrUserTextDataIsTooBig = errors.New("user text data is too big")
+
+	textDataMaxSize = 1000
+)
 
 // AddText функция для добавления текста пользователя.
 func (s *Services) AddText(ctx context.Context, req models.AddTextRequest) (int, error) {
 	if err := validateAddTextRequest(req); err != nil {
-		return 0, fmt.Errorf("failed to validate fields %w", err)
+		return 0, failedValidateFields(err)
 	}
 
 	data := models.EncryptTextData{
@@ -25,20 +28,20 @@ func (s *Services) AddText(ctx context.Context, req models.AddTextRequest) (int,
 	}
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		return 0, fmt.Errorf("failed to generate json data %w", err)
+		return 0, failedGenerateJSONData(err)
 	}
 
 	encData := s.crypter.EncryptData(jsonData)
 
 	id, err := s.storage.AddUserData(ctx, encData, req.Mark, req.Description, textDataType)
 	if err != nil {
-		return 0, fmt.Errorf("failed to add user data %w", err)
+		return 0, failedAddUserData(err)
 	}
 
 	return id, nil
 }
 
-// v функция для получения текста пользователя.
+// GetText функция для получения текста пользователя.
 func (s *Services) GetText(ctx context.Context, id int) (models.Text, error) {
 	resp := models.Text{}
 
@@ -48,18 +51,18 @@ func (s *Services) GetText(ctx context.Context, id int) (models.Text, error) {
 			return resp, ErrNotFound
 		}
 
-		return resp, fmt.Errorf("failed to get user data %w", err)
+		return resp, failedGetUserData(err)
 	}
 
 	jsonData, err := s.crypter.DecryptData(decData)
 	if err != nil {
-		return resp, fmt.Errorf("failed to decrypt data %w", err)
+		return resp, failedDecryptData(err)
 	}
 
 	var encData models.EncryptTextData
 
 	if err = json.Unmarshal(jsonData, &encData); err != nil {
-		return resp, fmt.Errorf("failed to generate data %w", err)
+		return resp, failedGenerateData(err)
 	}
 
 	resp.ID = id
@@ -71,13 +74,13 @@ func (s *Services) GetText(ctx context.Context, id int) (models.Text, error) {
 }
 
 func validateAddTextRequest(req models.AddTextRequest) error {
-	if len([]rune(req.Data)) > 1000 {
+	if len([]rune(req.Data)) > textDataMaxSize {
 		return ErrUserTextDataIsTooBig
 	}
-	if len([]rune(req.Mark)) > 50 {
+	if len([]rune(req.Mark)) > maxMarkSize {
 		return ErrUserMarkIsTooBig
 	}
-	if len([]rune(req.Description)) > 50 {
+	if len([]rune(req.Description)) > maxDescriptionSize {
 		return ErrUserDescriptionIsTooBig
 	}
 

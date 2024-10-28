@@ -29,7 +29,7 @@ type Servicer interface {
 	FetchUserData(ctx context.Context) ([]models.UserData, error)
 	AddPassword(ctx context.Context, req models.AddPasswordRequest) (int, error)
 	GetPassword(ctx context.Context, id int) (models.Password, error)
-	AddCard(ctx context.Context, req models.AddCardRequest) (int, error)
+	AddCard(ctx context.Context, req *models.AddCardRequest) (int, error)
 	GetCard(ctx context.Context, id int) (models.Card, error)
 	AddText(ctx context.Context, req models.AddTextRequest) (int, error)
 	GetText(ctx context.Context, id int) (models.Text, error)

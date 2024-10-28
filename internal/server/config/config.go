@@ -14,9 +14,9 @@ import (
 // Settings структура для конфигурирования сервиса.
 type Settings struct {
 	RunAddr     string        `json:"server_address" env:"SERVER_ADDRESS" envDefault:"localhost:8080"`
-	S3          S3Settings    `json:"s3"`
 	DatabaseURI string        `json:"db_uri" env:"DATABASE_URI" envDefault:"postgresql://localhost:5432/test"`
 	SecretKey   string        `json:"secret_key" env:"SECRET_KEY" envDefault:"1234567890"`
+	S3          S3Settings    `json:"s3"`
 	LogLevel    zapcore.Level `json:"log_level" env:"LOG_LEVEL" envDefault:"ERROR"`
 	EnableHTTPS bool          `json:"enable_https" env:"ENABLE_HTTPS" envDefault:"false"`
 }
@@ -25,10 +25,10 @@ type S3Settings struct {
 	Endpoint        string `json:"endpoint" env:"S3_ENDPOINT" envDefault:"localhost:9000"`
 	AccessKeyID     string `json:"access_key_id" env:"S3_ACCESS_KEY_ID" envDefault:"test_id"`
 	SecretAccessKey string `json:"secret_access_key" env:"S3_SECRET_ACCESS_KEY" envDefault:"test_secret"`
-	UseSSL          bool   `json:"use_ssl" env:"S3_USE_SSL" envDefault:"false"`
 	Region          string `json:"region" env:"S3_REGION" envDefault:"us-east-1"`
 	BucketName      string `json:"bucket_name" env:"S3_BACKET_NAME" envDefault:"testbucket"`
 	SecretPassword  string `json:"secret_password" env:"S3_SECRET_PASSWORD" envDefault:"12345678"`
+	UseSSL          bool   `json:"use_ssl" env:"S3_USE_SSL" envDefault:"false"`
 	SecureFiles     bool   `json:"secure_files" env:"S3_SECURE_FILES" envDefault:"false"`
 }
 

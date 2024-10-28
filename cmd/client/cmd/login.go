@@ -10,15 +10,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// loginCmd represents the login command
+// loginCmd represents the login command.
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Аутентификация пользователя",
 	Long:  "Аутентификация пользователя ранее зарегистрированного пользователя, запускается синхронизация",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		login, _ := cmd.Flags().GetString("login")
-		password, _ := cmd.Flags().GetString("password")
+		login, _ := cmd.Flags().GetString(loginFlag)
+		password, _ := cmd.Flags().GetString(passwordFlag)
 
 		req := models.CreateUserTokenRequest{
 			Login:    login,
@@ -26,12 +26,12 @@ var loginCmd = &cobra.Command{
 		}
 
 		if err := services.LoginUser(config.GetConfig(), req); err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
 		if err := services.SyncData(config.GetConfig()); err != nil {
-			fmt.Printf("Failed: %s", err)
+			printFailed(err)
 			os.Exit(1)
 		}
 
@@ -42,8 +42,14 @@ var loginCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(loginCmd)
 
-	loginCmd.Flags().StringP("login", "l", "", "Логин пользователя")
-	loginCmd.MarkFlagRequired("login")
-	loginCmd.Flags().StringP("password", "p", "", "Пароль пользователя")
-	loginCmd.MarkFlagRequired("password")
+	loginCmd.Flags().StringP(loginFlag, "l", "", "Логин пользователя")
+	loginCmd.Flags().StringP(passwordFlag, "p", "", "Пароль пользователя")
+	if err := loginCmd.MarkFlagRequired(loginFlag); err != nil {
+		printFailed(err)
+		os.Exit(1)
+	}
+	if err := loginCmd.MarkFlagRequired(passwordFlag); err != nil {
+		printFailed(err)
+		os.Exit(1)
+	}
 }

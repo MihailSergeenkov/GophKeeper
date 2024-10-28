@@ -1,4 +1,4 @@
-package main
+package main //nolint:typecheck // false-positive
 
 import (
 	"github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
