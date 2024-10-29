@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/services"
+	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +19,7 @@ var fileCmd = &cobra.Command{
 		mark, _ := cmd.Flags().GetString(markFlag)
 		description, _ := cmd.Flags().GetString(descriptionFlag)
 
-		if err := services.AddFile(config.GetConfig(), file, mark, description); err != nil {
+		if err := root.Services.AddFile(file, mark, description); err != nil {
 			printFailed(err)
 			os.Exit(1)
 		}

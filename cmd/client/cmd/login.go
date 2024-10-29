@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/services"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/spf13/cobra"
 )
@@ -25,12 +23,12 @@ var loginCmd = &cobra.Command{
 			Password: password,
 		}
 
-		if err := services.LoginUser(config.GetConfig(), req); err != nil {
+		if err := Services.LoginUser(req); err != nil {
 			printFailed(err)
 			os.Exit(1)
 		}
 
-		if err := services.SyncData(config.GetConfig()); err != nil {
+		if err := Services.SyncData(); err != nil {
 			printFailed(err)
 			os.Exit(1)
 		}

@@ -16,17 +16,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// TODO: Добавить работу с testcontainer
-// func TestRun(t *testing.T) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-// 	defer cancel()
-
-// 	t.Run("run server", func(t *testing.T) {
-// 		err := run(ctx, false)
-// 		require.NoError(t, err)
-// 	})
-// }.
-
 func TestConfigureServer(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()

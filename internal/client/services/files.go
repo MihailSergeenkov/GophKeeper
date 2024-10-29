@@ -4,27 +4,27 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // AddFile сервис добавления файла.
-func AddFile(cfg Configurer, filePath, mark, description string) error {
+func (s *Services) AddFile(filePath, mark, description string) error {
 	const path = "/user/files"
-	client := getClient(cfg)
 
 	addResp := models.AddResponse{}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, FormDataContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetFile("file", filePath).
-		SetFormData(map[string]string{
+	resp, err := s.httpRequests.Post(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, FormDataContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithFile(filePath),
+		requests.WithFormData(map[string]string{
 			"mark":        mark,
 			"description": description,
-		}).
-		SetResult(&addResp).
-		Post(cfg.GetServerAPI() + path)
-
+		}),
+		requests.WithResult(&addResp),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -39,7 +39,7 @@ func AddFile(cfg Configurer, filePath, mark, description string) error {
 		Type:        "file",
 	}
 
-	if err := cfg.AddData(d); err != nil {
+	if err := s.cfg.AddData(d); err != nil {
 		return failedDumpData(err)
 	}
 
@@ -47,21 +47,20 @@ func AddFile(cfg Configurer, filePath, mark, description string) error {
 }
 
 // GetFile сервис получения файла.
-func GetFile(cfg Configurer, id, dir string) error {
+func (s *Services) GetFile(id, dir string) error {
 	const path = "/user/files/{id}"
 
-	userData, ok := cfg.GetData()[id]
+	userData, ok := s.cfg.GetData()[id]
 	if !ok {
 		return errors.New("file id not found")
 	}
 
-	client := getClient(cfg)
-	client.SetOutputDirectory(dir)
-	resp, err := client.R().
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetPathParams(map[string]string{"id": id}).
-		SetOutput(userData.Mark).
-		Get(cfg.GetServerAPI() + path)
+	resp, err := s.httpRequests.Get(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithPathParams(map[string]string{"id": id}),
+		requests.WithOutput(dir+"/"+userData.Mark),
+	)
 
 	if err != nil {
 		return failedRequest(err)

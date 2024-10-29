@@ -5,24 +5,24 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // RegisterUser сервис регистрации пользователя.
-func RegisterUser(cfg Configurer, req models.RegisterUserRequest) error {
+func (s *Services) RegisterUser(req models.RegisterUserRequest) error {
 	const path = "/user/register"
-	client := getClient(cfg)
 
 	body, err := json.Marshal(req)
 	if err != nil {
 		return failedCreateBody(err)
 	}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetBody(body).
-		Post(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Post(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithBody(body),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -34,9 +34,8 @@ func RegisterUser(cfg Configurer, req models.RegisterUserRequest) error {
 }
 
 // LoginUser сервис аутентификации пользователя.
-func LoginUser(cfg Configurer, req models.CreateUserTokenRequest) error {
+func (s *Services) LoginUser(req models.CreateUserTokenRequest) error {
 	const path = "/user/token"
-	client := getClient(cfg)
 
 	body, err := json.Marshal(req)
 	if err != nil {
@@ -45,12 +44,12 @@ func LoginUser(cfg Configurer, req models.CreateUserTokenRequest) error {
 
 	userToken := models.CreateUserTokenResponse{}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetBody(body).
-		SetResult(&userToken).
-		Post(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Post(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithBody(body),
+		requests.WithResult(&userToken),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -58,19 +57,19 @@ func LoginUser(cfg Configurer, req models.CreateUserTokenRequest) error {
 		return failedResponseStatus(resp.Status())
 	}
 
-	if err := cfg.UpdateToken(userToken.AuthToken); err != nil {
+	if err := s.cfg.UpdateToken(userToken.AuthToken); err != nil {
 		return fmt.Errorf("failed to update auth token: %w", err)
 	}
 	return nil
 }
 
 // LogoutUser сервис удаления данных пользователя.
-func LogoutUser(cfg Configurer) error {
-	if err := cfg.UpdateToken(""); err != nil {
+func (s *Services) LogoutUser() error {
+	if err := s.cfg.UpdateToken(""); err != nil {
 		return fmt.Errorf("failed to update auth token: %w", err)
 	}
 
-	if err := cfg.UpdateData([]models.UserData{}); err != nil {
+	if err := s.cfg.UpdateData([]models.UserData{}); err != nil {
 		return fmt.Errorf("failed to update data: %w", err)
 	}
 

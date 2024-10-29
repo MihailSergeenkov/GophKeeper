@@ -2,8 +2,8 @@ package services
 
 import (
 	"fmt"
-	"time"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/go-resty/resty/v2"
 )
@@ -27,12 +27,24 @@ type Configurer interface {
 	AddData(data models.UserData) error
 }
 
-// getClient сервис получения HTTP клиента.
-func getClient(cfg Configurer) *resty.Client {
-	return resty.
-		New().
-		SetTimeout(time.Duration(cfg.GetRequestTimeout()) * time.Second).
-		SetRetryCount(cfg.GetRequestRetry())
+// Requester интерфейс для HTTP запросов.
+type Requester interface {
+	Get(url string, opts ...requests.RequestOptionFunc) (*resty.Response, error)
+	Post(url string, opts ...requests.RequestOptionFunc) (*resty.Response, error)
+}
+
+// Services структура для работы с сервисами клиента.
+type Services struct {
+	cfg          Configurer
+	httpRequests Requester
+}
+
+// Init функция инициализации сервисов клиента.
+func Init(cfg Configurer, httpRequests Requester) *Services {
+	return &Services{
+		cfg:          cfg,
+		httpRequests: httpRequests,
+	}
 }
 
 // failedRequest обертка ошибки запроса.

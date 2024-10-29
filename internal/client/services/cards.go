@@ -5,13 +5,13 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // AddCard сервис добавления данных банковской карты.
-func AddCard(cfg Configurer, req *models.AddCardRequest) error {
+func (s *Services) AddCard(req *models.AddCardRequest) error {
 	const path = "/user/cards"
-	client := getClient(cfg)
 
 	body, err := json.Marshal(req)
 	if err != nil {
@@ -20,13 +20,13 @@ func AddCard(cfg Configurer, req *models.AddCardRequest) error {
 
 	addResp := models.AddResponse{}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetBody(body).
-		SetResult(&addResp).
-		Post(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Post(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithBody(body),
+		requests.WithResult(&addResp),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -41,7 +41,7 @@ func AddCard(cfg Configurer, req *models.AddCardRequest) error {
 		Type:        "card",
 	}
 
-	if err := cfg.AddData(d); err != nil {
+	if err := s.cfg.AddData(d); err != nil {
 		return failedDumpData(err)
 	}
 
@@ -49,23 +49,22 @@ func AddCard(cfg Configurer, req *models.AddCardRequest) error {
 }
 
 // GetCard сервис получения данных банковской карты.
-func GetCard(cfg Configurer, id string) (models.Card, error) {
+func (s *Services) GetCard(id string) (models.Card, error) {
 	const path = "/user/cards/{id}"
 
 	card := models.Card{}
 
-	if _, ok := cfg.GetData()[id]; !ok {
+	if _, ok := s.cfg.GetData()[id]; !ok {
 		return card, errors.New("card id not found")
 	}
 
-	client := getClient(cfg)
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetPathParams(map[string]string{"id": id}).
-		SetResult(&card).
-		Get(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Get(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithPathParams(map[string]string{"id": id}),
+		requests.WithResult(&card),
+	)
 	if err != nil {
 		return card, failedRequest(err)
 	}

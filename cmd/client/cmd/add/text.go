@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/services"
+	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +26,7 @@ var textCmd = &cobra.Command{
 			Description: description,
 		}
 
-		if err := services.AddText(config.GetConfig(), req); err != nil {
+		if err := root.Services.AddText(req); err != nil {
 			printFailed(err)
 			os.Exit(1)
 		}

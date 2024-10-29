@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/services"
+	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +17,7 @@ var passwordCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
-		data, err := services.GetPassword(config.GetConfig(), id)
+		data, err := root.Services.GetPassword(id)
 		if err != nil {
 			printFailed(err)
 			os.Exit(1)

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/services"
+	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +17,7 @@ var fileCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		id := args[0]
 		dir, _ := cmd.Flags().GetString("upload-dir")
-		if err := services.GetFile(config.GetConfig(), id, dir); err != nil {
+		if err := root.Services.GetFile(id, dir); err != nil {
 			printFailed(err)
 			os.Exit(1)
 		}

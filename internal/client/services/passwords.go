@@ -5,13 +5,13 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // AddPassword сервис добавления данных логин-пароль.
-func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
+func (s *Services) AddPassword(req models.AddPasswordRequest) error {
 	const path = "/user/passwords"
-	client := getClient(cfg)
 
 	body, err := json.Marshal(req)
 	if err != nil {
@@ -20,13 +20,13 @@ func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
 
 	addResp := models.AddResponse{}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetBody(body).
-		SetResult(&addResp).
-		Post(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Post(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithBody(body),
+		requests.WithResult(&addResp),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -41,7 +41,7 @@ func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
 		Type:        "password",
 	}
 
-	if err := cfg.AddData(d); err != nil {
+	if err := s.cfg.AddData(d); err != nil {
 		return failedDumpData(err)
 	}
 
@@ -49,23 +49,22 @@ func AddPassword(cfg Configurer, req models.AddPasswordRequest) error {
 }
 
 // GetPassword сервис получения данных логин-пароль.
-func GetPassword(cfg Configurer, id string) (models.Password, error) {
+func (s *Services) GetPassword(id string) (models.Password, error) {
 	const path = "/user/passwords/{id}"
 
 	password := models.Password{}
 
-	if _, ok := cfg.GetData()[id]; !ok {
+	if _, ok := s.cfg.GetData()[id]; !ok {
 		return password, errors.New("password id not found")
 	}
 
-	client := getClient(cfg)
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetPathParams(map[string]string{"id": id}).
-		SetResult(&password).
-		Get(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Get(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithPathParams(map[string]string{"id": id}),
+		requests.WithResult(&password),
+	)
 	if err != nil {
 		return password, failedRequest(err)
 	}

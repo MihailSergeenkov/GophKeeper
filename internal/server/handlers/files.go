@@ -18,7 +18,7 @@ func (h *Handlers) AddFile() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseMultipartForm(10 << 20); err != nil { //nolint:gomnd // так нагляднее
 			w.WriteHeader(http.StatusInternalServerError)
-			h.logger.Error("failed to add file", zap.Error(err))
+			h.logger.Error("failed to parse file", zap.Error(err))
 			return
 		}
 

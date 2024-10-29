@@ -4,22 +4,21 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // SyncData сервис синхронизации данных с сервера.
-func SyncData(cfg Configurer) error {
+func (s *Services) SyncData() error {
 	const path = "/user/data"
-	client := getClient(cfg)
-
 	userData := []models.UserData{}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetResult(&userData).
-		Get(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Get(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithResult(&userData),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -28,17 +27,17 @@ func SyncData(cfg Configurer) error {
 		return failedResponseStatus(resp.Status())
 	}
 
-	if err := cfg.UpdateData(userData); err != nil {
+	if err := s.cfg.UpdateData(userData); err != nil {
 		return fmt.Errorf("failed to update data: %w", err)
 	}
 	return nil
 }
 
 // GetData сервис получения данных из кеша.
-func GetData(cfg Configurer) []models.UserData {
+func (s *Services) GetData() []models.UserData {
 	userData := []models.UserData{}
 
-	for _, v := range cfg.GetData() {
+	for _, v := range s.cfg.GetData() {
 		userData = append(userData, v)
 	}
 

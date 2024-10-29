@@ -5,13 +5,13 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 )
 
 // AddText сервис добавления текста.
-func AddText(cfg Configurer, req models.AddTextRequest) error {
+func (s *Services) AddText(req models.AddTextRequest) error {
 	const path = "/user/texts"
-	client := getClient(cfg)
 
 	body, err := json.Marshal(req)
 	if err != nil {
@@ -20,13 +20,13 @@ func AddText(cfg Configurer, req models.AddTextRequest) error {
 
 	addResp := models.AddResponse{}
 
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetBody(body).
-		SetResult(&addResp).
-		Post(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Post(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithBody(body),
+		requests.WithResult(&addResp),
+	)
 	if err != nil {
 		return failedRequest(err)
 	}
@@ -41,7 +41,7 @@ func AddText(cfg Configurer, req models.AddTextRequest) error {
 		Type:        "text",
 	}
 
-	if err := cfg.AddData(d); err != nil {
+	if err := s.cfg.AddData(d); err != nil {
 		return failedDumpData(err)
 	}
 
@@ -49,23 +49,22 @@ func AddText(cfg Configurer, req models.AddTextRequest) error {
 }
 
 // GetText сервис получения текста.
-func GetText(cfg Configurer, id string) (models.Text, error) {
+func (s *Services) GetText(id string) (models.Text, error) {
 	const path = "/user/texts/{id}"
 
 	text := models.Text{}
 
-	if _, ok := cfg.GetData()[id]; !ok {
+	if _, ok := s.cfg.GetData()[id]; !ok {
 		return text, errors.New("text id not found")
 	}
 
-	client := getClient(cfg)
-	resp, err := client.R().
-		SetHeader(ContentTypeHeader, JSONContentType).
-		SetHeader(AuthHeader, cfg.GetToken()).
-		SetPathParams(map[string]string{"id": id}).
-		SetResult(&text).
-		Get(cfg.GetServerAPI() + path)
-
+	resp, err := s.httpRequests.Get(
+		s.cfg.GetServerAPI()+path,
+		requests.WithHeader(ContentTypeHeader, JSONContentType),
+		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
+		requests.WithPathParams(map[string]string{"id": id}),
+		requests.WithResult(&text),
+	)
 	if err != nil {
 		return text, failedRequest(err)
 	}

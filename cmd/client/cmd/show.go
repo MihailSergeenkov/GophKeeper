@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
-	"github.com/MihailSergeenkov/GophKeeper/internal/client/services"
 	"github.com/spf13/cobra"
 )
 
@@ -19,14 +17,13 @@ var showCmd = &cobra.Command{
 		sync, _ := cmd.Flags().GetBool("sync")
 
 		if sync {
-			if err := services.SyncData(config.GetConfig()); err != nil {
+			if err := Services.SyncData(); err != nil {
 				printFailed(err)
 				os.Exit(1)
 			}
 		}
 
-		userData := services.GetData(config.GetConfig())
-
+		userData := Services.GetData()
 		b, err := json.MarshalIndent(userData, "", "  ")
 		if err != nil {
 			printFailed(err)
