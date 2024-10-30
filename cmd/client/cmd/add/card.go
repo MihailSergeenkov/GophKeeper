@@ -1,9 +1,6 @@
 package add
 
 import (
-	"fmt"
-	"os"
-
 	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/spf13/cobra"
@@ -33,11 +30,11 @@ var cardCmd = &cobra.Command{
 		}
 
 		if err := root.Services.AddCard(&req); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println("Add text OK")
+		cmd.Println("Add card OK")
 	},
 }
 
@@ -49,7 +46,7 @@ func init() {
 	cardCmd.Flags().StringP("expiry-date", "e", "", "Дата окончания карты для сохранения")
 	cardCmd.Flags().String("cvv2", "", "CVV2 карты для сохранения")
 	if err := cardCmd.MarkFlagRequired("number"); err != nil {
-		printFailed(err)
-		os.Exit(1)
+		printFailed(addCmd, err)
+		return
 	}
 }

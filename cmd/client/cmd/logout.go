@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
@@ -15,11 +12,11 @@ var logoutCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := Services.LogoutUser(); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println("Logout OK")
+		cmd.Println("Logout OK")
 	},
 }
 

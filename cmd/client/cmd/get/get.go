@@ -1,9 +1,7 @@
 package get
 
 import (
-	"fmt"
-
-	"github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
+	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +13,9 @@ var getCmd = &cobra.Command{
 }
 
 func init() {
-	cmd.RootCmd.AddCommand(getCmd)
+	root.RootCmd.AddCommand(getCmd)
 }
 
-func printFailed(err error) {
-	fmt.Printf("Failed: %s", err)
+func printFailed(cmd *cobra.Command, err error) {
+	cmd.Printf("Failed: %s", err)
 }

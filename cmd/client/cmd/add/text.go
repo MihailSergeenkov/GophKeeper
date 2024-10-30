@@ -1,9 +1,6 @@
 package add
 
 import (
-	"fmt"
-	"os"
-
 	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/spf13/cobra"
@@ -27,11 +24,11 @@ var textCmd = &cobra.Command{
 		}
 
 		if err := root.Services.AddText(req); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println("Add text OK")
+		cmd.Println("Add text OK")
 	},
 }
 
@@ -40,7 +37,7 @@ func init() {
 
 	textCmd.Flags().StringP("text", "t", "", "Текст для сохранения")
 	if err := textCmd.MarkFlagRequired("text"); err != nil {
-		printFailed(err)
-		os.Exit(1)
+		printFailed(addCmd, err)
+		return
 	}
 }

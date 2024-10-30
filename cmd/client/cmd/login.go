@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -24,16 +23,16 @@ var loginCmd = &cobra.Command{
 		}
 
 		if err := Services.LoginUser(req); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
 		if err := Services.SyncData(); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println("Login OK")
+		cmd.Println("Login OK")
 	},
 }
 
@@ -43,11 +42,11 @@ func init() {
 	loginCmd.Flags().StringP(loginFlag, "l", "", "Логин пользователя")
 	loginCmd.Flags().StringP(passwordFlag, "p", "", "Пароль пользователя")
 	if err := loginCmd.MarkFlagRequired(loginFlag); err != nil {
-		printFailed(err)
+		printFailed(RootCmd, err)
 		os.Exit(1)
 	}
 	if err := loginCmd.MarkFlagRequired(passwordFlag); err != nil {
-		printFailed(err)
+		printFailed(RootCmd, err)
 		os.Exit(1)
 	}
 }

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/client/config"
@@ -60,6 +59,6 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "cfg", "", "config file (default is $HOME/.goph-keeeper.yaml)")
 }
 
-func printFailed(err error) {
-	fmt.Printf("Failed: %s", err)
+func printFailed(cmd *cobra.Command, err error) {
+	cmd.PrintErrf("Failed: %s", err)
 }

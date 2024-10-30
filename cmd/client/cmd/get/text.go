@@ -2,8 +2,6 @@ package get
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 
 	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
@@ -19,17 +17,17 @@ var textCmd = &cobra.Command{
 		id := args[0]
 		data, err := root.Services.GetText(id)
 		if err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
 		b, err := json.MarshalIndent(data, "", "  ")
 		if err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println(string(b))
+		cmd.Println(string(b))
 	},
 }
 

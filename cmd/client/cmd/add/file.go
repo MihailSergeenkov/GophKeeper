@@ -1,9 +1,6 @@
 package add
 
 import (
-	"fmt"
-	"os"
-
 	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
@@ -20,11 +17,11 @@ var fileCmd = &cobra.Command{
 		description, _ := cmd.Flags().GetString(descriptionFlag)
 
 		if err := root.Services.AddFile(file, mark, description); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println("Add file OK")
+		cmd.Println("Add file OK")
 	},
 }
 
@@ -33,7 +30,7 @@ func init() {
 
 	fileCmd.Flags().StringP("file", "f", "", "Файл для сохранения")
 	if err := fileCmd.MarkFlagRequired("file"); err != nil {
-		printFailed(err)
-		os.Exit(1)
+		printFailed(addCmd, err)
+		return
 	}
 }

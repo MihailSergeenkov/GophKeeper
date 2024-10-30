@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -18,19 +16,19 @@ var showCmd = &cobra.Command{
 
 		if sync {
 			if err := Services.SyncData(); err != nil {
-				printFailed(err)
-				os.Exit(1)
+				printFailed(cmd, err)
+				return
 			}
 		}
 
 		userData := Services.GetData()
 		b, err := json.MarshalIndent(userData, "", "  ")
 		if err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println(string(b))
+		cmd.Println(string(b))
 	},
 }
 

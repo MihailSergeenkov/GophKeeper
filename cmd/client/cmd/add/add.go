@@ -1,10 +1,9 @@
 package add
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
+	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -21,16 +20,16 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	cmd.RootCmd.AddCommand(addCmd)
+	root.RootCmd.AddCommand(addCmd)
 
 	addCmd.PersistentFlags().StringP(markFlag, "m", "", "Пометка для объекта данных")
 	addCmd.PersistentFlags().StringP(descriptionFlag, "d", "", "Дополнительное описание для объекта данных")
 	if err := addCmd.MarkPersistentFlagRequired(markFlag); err != nil {
-		printFailed(err)
+		printFailed(root.RootCmd, err)
 		os.Exit(1)
 	}
 }
 
-func printFailed(err error) {
-	fmt.Printf("Failed: %s", err)
+func printFailed(cmd *cobra.Command, err error) {
+	cmd.Printf("Failed: %s", err)
 }

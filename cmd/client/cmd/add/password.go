@@ -1,9 +1,6 @@
 package add
 
 import (
-	"fmt"
-	"os"
-
 	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/spf13/cobra"
@@ -29,11 +26,11 @@ var passwordCmd = &cobra.Command{
 		}
 
 		if err := root.Services.AddPassword(req); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Println("Add password OK")
+		cmd.Println("Add password OK")
 	},
 }
 
@@ -43,11 +40,11 @@ func init() {
 	passwordCmd.Flags().StringP("login", "l", "", "Логин для сохранения")
 	passwordCmd.Flags().StringP("password", "p", "", "Пароль для сохранения")
 	if err := passwordCmd.MarkFlagRequired("login"); err != nil {
-		printFailed(err)
-		os.Exit(1)
+		printFailed(addCmd, err)
+		return
 	}
 	if err := passwordCmd.MarkFlagRequired("password"); err != nil {
-		printFailed(err)
-		os.Exit(1)
+		printFailed(addCmd, err)
+		return
 	}
 }

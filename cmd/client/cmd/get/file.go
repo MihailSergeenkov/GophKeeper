@@ -1,9 +1,6 @@
 package get
 
 import (
-	"fmt"
-	"os"
-
 	root "github.com/MihailSergeenkov/GophKeeper/cmd/client/cmd"
 	"github.com/spf13/cobra"
 )
@@ -18,11 +15,11 @@ var fileCmd = &cobra.Command{
 		id := args[0]
 		dir, _ := cmd.Flags().GetString("upload-dir")
 		if err := root.Services.GetFile(id, dir); err != nil {
-			printFailed(err)
-			os.Exit(1)
+			printFailed(cmd, err)
+			return
 		}
 
-		fmt.Printf("File load in %s", dir)
+		cmd.Printf("File load in %s", dir)
 	},
 }
 
