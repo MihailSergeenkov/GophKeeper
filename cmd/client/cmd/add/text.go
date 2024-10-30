@@ -36,8 +36,5 @@ func init() {
 	addCmd.AddCommand(textCmd)
 
 	textCmd.Flags().StringP("text", "t", "", "Текст для сохранения")
-	if err := textCmd.MarkFlagRequired("text"); err != nil {
-		printFailed(addCmd, err)
-		return
-	}
+	_ = textCmd.MarkFlagRequired("text")
 }

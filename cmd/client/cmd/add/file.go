@@ -29,8 +29,5 @@ func init() {
 	addCmd.AddCommand(fileCmd)
 
 	fileCmd.Flags().StringP("file", "f", "", "Файл для сохранения")
-	if err := fileCmd.MarkFlagRequired("file"); err != nil {
-		printFailed(addCmd, err)
-		return
-	}
+	_ = fileCmd.MarkFlagRequired("file")
 }

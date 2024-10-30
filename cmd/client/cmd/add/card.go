@@ -45,8 +45,5 @@ func init() {
 	cardCmd.Flags().StringP("owner", "o", "", "Владелец карты для сохранения")
 	cardCmd.Flags().StringP("expiry-date", "e", "", "Дата окончания карты для сохранения")
 	cardCmd.Flags().String("cvv2", "", "CVV2 карты для сохранения")
-	if err := cardCmd.MarkFlagRequired("number"); err != nil {
-		printFailed(addCmd, err)
-		return
-	}
+	_ = cardCmd.MarkFlagRequired("number")
 }

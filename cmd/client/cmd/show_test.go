@@ -51,6 +51,19 @@ func TestShowCmd(t *testing.T) {
 		output   string
 	}{
 		{
+			name: "show success without sync",
+			args: []string{"show"},
+			syncData: syncData{
+				count: 0,
+				err:   nil,
+			},
+			getData: getData{
+				count: 1,
+				resp:  data,
+			},
+			output: expectedOutput,
+		},
+		{
 			name: "show success with sync",
 			args: []string{"show", "-s"},
 			syncData: syncData{

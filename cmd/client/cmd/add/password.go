@@ -39,12 +39,6 @@ func init() {
 
 	passwordCmd.Flags().StringP("login", "l", "", "Логин для сохранения")
 	passwordCmd.Flags().StringP("password", "p", "", "Пароль для сохранения")
-	if err := passwordCmd.MarkFlagRequired("login"); err != nil {
-		printFailed(addCmd, err)
-		return
-	}
-	if err := passwordCmd.MarkFlagRequired("password"); err != nil {
-		printFailed(addCmd, err)
-		return
-	}
+	_ = passwordCmd.MarkFlagRequired("login")
+	_ = passwordCmd.MarkFlagRequired("password")
 }

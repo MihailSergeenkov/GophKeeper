@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/spf13/cobra"
 )
@@ -41,12 +39,6 @@ func init() {
 
 	loginCmd.Flags().StringP(loginFlag, "l", "", "Логин пользователя")
 	loginCmd.Flags().StringP(passwordFlag, "p", "", "Пароль пользователя")
-	if err := loginCmd.MarkFlagRequired(loginFlag); err != nil {
-		printFailed(RootCmd, err)
-		os.Exit(1)
-	}
-	if err := loginCmd.MarkFlagRequired(passwordFlag); err != nil {
-		printFailed(RootCmd, err)
-		os.Exit(1)
-	}
+	_ = loginCmd.MarkFlagRequired(loginFlag)
+	_ = loginCmd.MarkFlagRequired(passwordFlag)
 }

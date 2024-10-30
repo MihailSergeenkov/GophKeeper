@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -14,6 +15,7 @@ var showCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		sync, _ := cmd.Flags().GetBool("sync")
 
+		fmt.Print("wrsdfsdfsdf", sync)
 		if sync {
 			if err := Services.SyncData(); err != nil {
 				printFailed(cmd, err)
