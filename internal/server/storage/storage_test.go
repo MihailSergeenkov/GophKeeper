@@ -448,3 +448,66 @@ func TestGetUserData(t *testing.T) {
 		})
 	}
 }
+
+func TestGetFileUserData(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	pool := mocks.NewMockDBPooler(mockCtrl)
+	logger := zap.NewNop()
+	storage := Storage{
+		pool:   pool,
+		logger: logger,
+	}
+	currentUserID := "some_id"
+	ctx := context.WithValue(context.Background(), constants.KeyUserID, currentUserID)
+	stmt := `
+		SELECT data FROM user_data 
+		WHERE user_id = $1 AND mark = $2 AND type = 'file' LIMIT 1
+	`
+
+	row := mocks.NewMockRow(mockCtrl)
+	fileMark := "test"
+
+	tests := []struct {
+		name    string
+		wantErr bool
+		errText string
+		rowErr  error
+	}{
+		{
+			name:    "success get",
+			wantErr: false,
+			errText: "",
+			rowErr:  nil,
+		},
+		{
+			name:    "failed read row",
+			wantErr: true,
+			errText: "failed to scan a response row",
+			rowErr:  errors.New("some error"),
+		},
+		{
+			name:    "not found row",
+			wantErr: true,
+			errText: "user data not found",
+			rowErr:  pgx.ErrNoRows,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			pool.EXPECT().QueryRow(ctx, stmt, currentUserID, fileMark).Times(1).Return(row)
+
+			row.EXPECT().Scan(gomock.Any()).Times(1).Return(test.rowErr)
+
+			_, err := storage.GetFileUserData(ctx, fileMark)
+
+			if test.wantErr {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, test.errText)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}

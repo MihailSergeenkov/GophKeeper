@@ -34,7 +34,7 @@ type Servicer interface {
 	AddText(ctx context.Context, req models.AddTextRequest) (int, error)
 	GetText(ctx context.Context, id int) (models.Text, error)
 	AddFile(ctx context.Context, req models.AddFileRequest) (int, error)
-	GetFile(ctx context.Context, id int) (models.File, error)
+	GetFile(ctx context.Context, fileMark string) (models.File, error)
 }
 
 // Logger интерфейс для логгера приложения.

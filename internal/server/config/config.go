@@ -26,7 +26,6 @@ type S3Settings struct {
 	AccessKeyID     string `json:"access_key_id" env:"S3_ACCESS_KEY_ID" envDefault:"test_id"`
 	SecretAccessKey string `json:"secret_access_key" env:"S3_SECRET_ACCESS_KEY" envDefault:"test_secret"`
 	Region          string `json:"region" env:"S3_REGION" envDefault:"us-east-1"`
-	BucketName      string `json:"bucket_name" env:"S3_BACKET_NAME" envDefault:"testbucket"`
 	SecretPassword  string `json:"secret_password" env:"S3_SECRET_PASSWORD" envDefault:"12345678"`
 	UseSSL          bool   `json:"use_ssl" env:"S3_USE_SSL" envDefault:"false"`
 	SecureFiles     bool   `json:"secure_files" env:"S3_SECURE_FILES" envDefault:"false"`
@@ -124,7 +123,6 @@ func (s *Settings) parseFlags() {
 	flag.StringVar(&s.S3.SecretAccessKey, "ss", s.S3.SecretAccessKey, "secret access key for s3")
 	flag.BoolVar(&s.S3.UseSSL, "su", s.S3.UseSSL, "enable SSL for S3")
 	flag.StringVar(&s.S3.Region, "sr", s.S3.Region, "region for s3")
-	flag.StringVar(&s.S3.BucketName, "sb", s.S3.BucketName, "bucket name for s3")
 	flag.StringVar(&s.S3.SecretPassword, "sp", s.S3.SecretPassword, "secret password for s3")
 	flag.BoolVar(&s.S3.SecureFiles, "sf", s.S3.SecureFiles, "secure files in S3")
 

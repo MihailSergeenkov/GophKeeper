@@ -88,6 +88,11 @@ func (cfg *Config) UpdateToken(token string) error {
 func (cfg *Config) UpdateData(data []models.UserData) error {
 	updateData := make(map[string]models.UserData, len(data))
 	for _, v := range data {
+		if v.Type == "file" {
+			updateData[v.Mark] = v
+			continue
+		}
+
 		updateData[strconv.Itoa(v.ID)] = v
 	}
 	viper.Set("data", updateData)
@@ -104,7 +109,8 @@ func (cfg *Config) UpdateData(data []models.UserData) error {
 func (cfg *Config) AddData(data models.UserData) error {
 	updateData := make(map[string]models.UserData, 0)
 	maps.Copy(updateData, cfg.Data)
-	updateData[strconv.Itoa(data.ID)] = data
+	key := getKey(data)
+	updateData[key] = data
 	viper.Set("data", updateData)
 
 	if err := viper.WriteConfig(); err != nil {
@@ -129,4 +135,12 @@ func initConfigFile(cfgFile *string) {
 	viper.SetConfigName(".goph-keeper")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("$HOME")
+}
+
+func getKey(data models.UserData) string {
+	if data.Type == "file" {
+		return data.Mark
+	}
+
+	return strconv.Itoa(data.ID)
 }

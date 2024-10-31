@@ -51,7 +51,7 @@ func NewRouter(h Handlerer, settings *config.Settings, l *zap.Logger, s Storager
 			r.Use(authMiddleware(settings, l, s))
 
 			r.Route("/files", func(r chi.Router) {
-				r.Get("/{fileID}", h.GetFile())
+				r.Get("/{fileMark}", h.GetFile())
 				r.Post("/", h.AddFile())
 			})
 		})

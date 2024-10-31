@@ -131,7 +131,7 @@ func TestGetFile(t *testing.T) {
 	s := Init(cfg, r)
 
 	url := "http://some/api"
-	fileID := "1"
+	fileMark := "test"
 	dir := "."
 
 	type getResponse struct {
@@ -149,7 +149,7 @@ func TestGetFile(t *testing.T) {
 		{
 			name: "file text success",
 			data: map[string]models.UserData{
-				"1": {
+				fileMark: {
 					ID: 1,
 				},
 			},
@@ -166,7 +166,7 @@ func TestGetFile(t *testing.T) {
 		{
 			name: "file not found",
 			data: map[string]models.UserData{
-				"2": {
+				"test2": {
 					ID: 2,
 				},
 			},
@@ -176,12 +176,12 @@ func TestGetFile(t *testing.T) {
 				err:   nil,
 			},
 			wantErr: true,
-			errText: "file id not found",
+			errText: "file mark not found",
 		},
 		{
 			name: "get file failed when response status not 200",
 			data: map[string]models.UserData{
-				"1": {
+				fileMark: {
 					ID: 1,
 				},
 			},
@@ -198,7 +198,7 @@ func TestGetFile(t *testing.T) {
 		{
 			name: "get file failed when request failed",
 			data: map[string]models.UserData{
-				"1": {
+				fileMark: {
 					ID: 1,
 				},
 			},
@@ -217,10 +217,10 @@ func TestGetFile(t *testing.T) {
 			cfg.EXPECT().GetToken().Times(test.getResponse.count).Return("token")
 			cfg.EXPECT().GetServerAPI().Times(test.getResponse.count).Return(url)
 
-			r.EXPECT().Get(url+"/user/files/{id}", gomock.Any(), gomock.Any(), gomock.Any()).
+			r.EXPECT().Get(url+"/user/files/{fileMark}", gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(test.getResponse.count).Return(test.getResponse.resp, test.getResponse.err)
 
-			err := s.GetFile(fileID, dir)
+			err := s.GetFile(fileMark, dir)
 
 			if test.wantErr {
 				require.Error(t, err)

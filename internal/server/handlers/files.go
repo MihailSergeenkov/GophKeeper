@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"net/http"
-	"strconv"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/services"
@@ -64,15 +63,9 @@ func (h *Handlers) AddFile() http.HandlerFunc {
 // GetFile обработчик для получения конкретного файла пользователя.
 func (h *Handlers) GetFile() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := chi.URLParam(r, "fileID")
-		fileID, err := strconv.Atoi(id)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			h.logger.Error("failed file ID param", zap.Error(err))
-			return
-		}
+		fileMark := chi.URLParam(r, "fileMark")
 
-		file, err := h.services.GetFile(r.Context(), fileID)
+		file, err := h.services.GetFile(r.Context(), fileMark)
 		if err != nil {
 			if errors.Is(err, services.ErrNotFound) {
 				w.WriteHeader(http.StatusNotFound)

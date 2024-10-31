@@ -238,7 +238,7 @@ func TestGetFile(t *testing.T) {
 	require.NoError(t, err)
 	storage := rMocks.NewMockStorager(mockCtrl)
 
-	fileID := 1
+	fileMark := "test"
 
 	r := routes.NewRouter(handlers, settings, zap.NewNop(), storage)
 	ts := httptest.NewServer(r)
@@ -299,44 +299,16 @@ func TestGetFile(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			s.EXPECT().GetFile(gomock.Any(), fileID).Times(1).
+			s.EXPECT().GetFile(gomock.Any(), fileMark).Times(1).
 				Return(test.serviceResponse.res, test.serviceResponse.err)
 
 			l.EXPECT().Error(test.want.log, zap.Error(test.serviceResponse.err)).Times(test.want.errorLogTimes)
 			storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
 
-			res, _ := testGetRequest(t, ts, "/api/user/files/1")
+			res, _ := testGetRequest(t, ts, "/api/user/files/test")
 			closeBody(t, res)
 
 			assert.Equal(t, test.want.code, res.StatusCode)
 		})
 	}
-}
-
-func TestGetFileFailedReadParam(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	s := mocks.NewMockServicer(mockCtrl)
-	l := mocks.NewMockLogger(mockCtrl)
-	handlers := NewHandlers(s, l)
-
-	settings, err := config.Setup(false)
-	require.NoError(t, err)
-	storage := rMocks.NewMockStorager(mockCtrl)
-
-	r := routes.NewRouter(handlers, settings, zap.NewNop(), storage)
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-
-	t.Run("failed to read request param", func(t *testing.T) {
-		s.EXPECT().GetCard(gomock.Any(), gomock.Any()).Times(0)
-		l.EXPECT().Error("failed file ID param", gomock.Any()).Times(1)
-		storage.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Times(1)
-
-		res, _ := testGetRequest(t, ts, "/api/user/files/adasd")
-		closeBody(t, res)
-
-		assert.Equal(t, http.StatusBadRequest, res.StatusCode)
-	})
 }

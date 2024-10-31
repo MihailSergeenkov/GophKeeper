@@ -80,6 +80,21 @@ func (mr *MockStoragerMockRecorder) FetchUserData(ctx interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserData", reflect.TypeOf((*MockStorager)(nil).FetchUserData), ctx)
 }
 
+// GetFileUserData mocks base method.
+func (m *MockStorager) GetFileUserData(ctx context.Context, fileMark string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFileUserData", ctx, fileMark)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFileUserData indicates an expected call of GetFileUserData.
+func (mr *MockStoragerMockRecorder) GetFileUserData(ctx, fileMark interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileUserData", reflect.TypeOf((*MockStorager)(nil).GetFileUserData), ctx, fileMark)
+}
+
 // GetUserByLogin mocks base method.
 func (m *MockStorager) GetUserByLogin(ctx context.Context, userLogin string) (models.User, error) {
 	m.ctrl.T.Helper()

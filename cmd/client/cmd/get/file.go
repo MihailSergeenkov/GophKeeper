@@ -7,14 +7,14 @@ import (
 
 // fileCmd represents the file command.
 var fileCmd = &cobra.Command{
-	Use:   "file [ID]",
+	Use:   "file [MARK]",
 	Short: "Получить файл",
-	Long:  "Получить файл по его ID",
+	Long:  "Получить файл по его метке (MARK)",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		id := args[0]
+		fileMark := args[0]
 		dir, _ := cmd.Flags().GetString("upload-dir")
-		if err := root.Services.GetFile(id, dir); err != nil {
+		if err := root.Services.GetFile(fileMark, dir); err != nil {
 			printFailed(cmd, err)
 			return
 		}

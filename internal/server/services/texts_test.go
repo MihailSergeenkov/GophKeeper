@@ -134,7 +134,7 @@ func TestAddTextValidationFailed(t *testing.T) {
 			arg: arg{
 				req: models.AddTextRequest{
 					Data:        "test",
-					Mark:        "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Mark:        generateString(150),
 					Description: "test",
 				},
 			},
@@ -148,7 +148,7 @@ func TestAddTextValidationFailed(t *testing.T) {
 				req: models.AddTextRequest{
 					Data:        "test",
 					Mark:        "test",
-					Description: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Description: generateString(4000),
 				},
 			},
 			want: want{

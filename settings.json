@@ -10,7 +10,6 @@
     "secret_access_key": "test_secret_access_key",
     "use_ssl": false,
     "region": "us-east-1",
-    "bucket_name": "testbucket",
     "secret_password": "12345",
     "secure_files": false
   }

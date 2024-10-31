@@ -181,7 +181,7 @@ func TestAddCardValidationFailed(t *testing.T) {
 					Owner:       "test",
 					ExpiryDate:  "11/2300",
 					CVV2:        "777",
-					Mark:        "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Mark:        generateString(150),
 					Description: "test",
 				},
 			},
@@ -198,7 +198,7 @@ func TestAddCardValidationFailed(t *testing.T) {
 					ExpiryDate:  "11/2300",
 					CVV2:        "777",
 					Mark:        "test",
-					Description: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Description: generateString(4000),
 				},
 			},
 			want: want{

@@ -15,8 +15,8 @@ var (
 	ErrUserMarkIsTooBig        = errors.New("user mark is too big")
 	ErrUserDescriptionIsTooBig = errors.New("user description is too big")
 
-	maxMarkSize        = 50
-	maxDescriptionSize = 50
+	maxMarkSize        = 100
+	maxDescriptionSize = 3000
 )
 
 // Services структура для работы с сервисами приложения.
@@ -35,6 +35,7 @@ type Storager interface {
 	FetchUserData(ctx context.Context) ([]models.UserData, error)
 	AddUserData(ctx context.Context, encData []byte, mark string, description string, dataType string) (int, error)
 	GetUserData(ctx context.Context, id int, dataType string) ([]byte, string, string, error)
+	GetFileUserData(ctx context.Context, fileMark string) ([]byte, error)
 }
 
 // Crypter интерфейс для криптографии.
@@ -59,7 +60,7 @@ func NewServices(storage Storager, fileStorage FileStorager, crypter Crypter, se
 	}
 }
 
-// failedValidateFieldsv оберта ошибки валидации.
+// failedValidateFields оберта ошибки валидации.
 func failedValidateFields(err error) error {
 	return fmt.Errorf("failed to validate fields %w", err)
 }

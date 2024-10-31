@@ -242,3 +242,26 @@ func (s *Storage) GetUserData(ctx context.Context, id int, dataType string) ([]b
 
 	return data, mark, description, nil
 }
+
+// GetFileUserData получить файл пользователя.
+func (s *Storage) GetFileUserData(ctx context.Context, fileMark string) ([]byte, error) {
+	const query = `
+		SELECT data FROM user_data 
+		WHERE user_id = $1 AND mark = $2 AND type = 'file' LIMIT 1
+	`
+
+	row := s.pool.QueryRow(ctx, query, ctx.Value(constants.KeyUserID), fileMark)
+
+	var data []byte
+
+	err := row.Scan(&data)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrUserDataNotFound
+		}
+
+		return nil, fmt.Errorf("failed to scan a response row: %w", err)
+	}
+
+	return data, nil
+}

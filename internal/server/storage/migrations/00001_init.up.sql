@@ -15,7 +15,7 @@ CREATE TABLE user_data(
   data BYTEA NOT NULL,
 	type user_data_type NOT NULL,
 	mark VARCHAR(100) NOT NULL,
-	description VARCHAR(500) NOT NULL
+	description VARCHAR(3000) NOT NULL
 );
 CREATE INDEX user_data_user_id_index ON user_data(user_id);
 

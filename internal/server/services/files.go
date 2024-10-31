@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
+	"strings"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
 	"github.com/MihailSergeenkov/GophKeeper/internal/server/storage"
@@ -33,7 +33,9 @@ func (s *Services) AddFile(ctx context.Context, req models.AddFileRequest) (int,
 
 	encData := s.crypter.EncryptData(jsonData)
 
-	id, err := s.storage.AddUserData(ctx, encData, req.Mark, req.Description, fileDataType)
+	preparedMark := strings.ReplaceAll(strings.ToLower(req.Mark), " ", "_")
+
+	id, err := s.storage.AddUserData(ctx, encData, preparedMark, req.Description, fileDataType)
 	if err != nil {
 		return 0, failedAddUserData(err)
 	}
@@ -42,9 +44,9 @@ func (s *Services) AddFile(ctx context.Context, req models.AddFileRequest) (int,
 }
 
 // GetFile функция для получения файла пользователя в виде массива байт.
-func (s *Services) GetFile(ctx context.Context, id int) (models.File, error) {
+func (s *Services) GetFile(ctx context.Context, fileMark string) (models.File, error) {
 	var resp models.File
-	decData, _, _, err := s.storage.GetUserData(ctx, id, fileDataType)
+	decData, err := s.storage.GetFileUserData(ctx, fileMark)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserDataNotFound) {
 			return resp, ErrNotFound
@@ -64,7 +66,6 @@ func (s *Services) GetFile(ctx context.Context, id int) (models.File, error) {
 		return resp, failedGenerateData(err)
 	}
 
-	log.Print(encData.FileName)
 	file, err := s.fileStorage.GetFile(ctx, encData.FileName)
 	if err != nil {
 		return resp, fmt.Errorf("failed to get file from filestorage %w", err)

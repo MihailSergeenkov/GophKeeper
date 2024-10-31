@@ -142,18 +142,18 @@ func (mr *MockServicerMockRecorder) GetCard(ctx, id interface{}) *gomock.Call {
 }
 
 // GetFile mocks base method.
-func (m *MockServicer) GetFile(ctx context.Context, id int) (models.File, error) {
+func (m *MockServicer) GetFile(ctx context.Context, fileMark string) (models.File, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFile", ctx, id)
+	ret := m.ctrl.Call(m, "GetFile", ctx, fileMark)
 	ret0, _ := ret[0].(models.File)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFile indicates an expected call of GetFile.
-func (mr *MockServicerMockRecorder) GetFile(ctx, id interface{}) *gomock.Call {
+func (mr *MockServicerMockRecorder) GetFile(ctx, fileMark interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockServicer)(nil).GetFile), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockServicer)(nil).GetFile), ctx, fileMark)
 }
 
 // GetPassword mocks base method.

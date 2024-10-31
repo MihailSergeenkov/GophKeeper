@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/MihailSergeenkov/GophKeeper/internal/client/requests"
 	"github.com/MihailSergeenkov/GophKeeper/internal/models"
@@ -14,13 +15,15 @@ func (s *Services) AddFile(filePath, mark, description string) error {
 
 	addResp := models.AddResponse{}
 
+	preparedMark := strings.ReplaceAll(strings.ToLower(mark), " ", "_")
+
 	resp, err := s.httpRequests.Post(
 		s.cfg.GetServerAPI()+path,
 		requests.WithHeader(ContentTypeHeader, FormDataContentType),
 		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
 		requests.WithFile(filePath),
 		requests.WithFormData(map[string]string{
-			"mark":        mark,
+			"mark":        preparedMark,
 			"description": description,
 		}),
 		requests.WithResult(&addResp),
@@ -34,7 +37,7 @@ func (s *Services) AddFile(filePath, mark, description string) error {
 
 	d := models.UserData{
 		ID:          addResp.ID,
-		Mark:        mark,
+		Mark:        preparedMark,
 		Description: description,
 		Type:        "file",
 	}
@@ -47,19 +50,18 @@ func (s *Services) AddFile(filePath, mark, description string) error {
 }
 
 // GetFile сервис получения файла.
-func (s *Services) GetFile(id, dir string) error {
-	const path = "/user/files/{id}"
+func (s *Services) GetFile(fileMark, dir string) error {
+	const path = "/user/files/{fileMark}"
 
-	userData, ok := s.cfg.GetData()[id]
-	if !ok {
-		return errors.New("file id not found")
+	if _, ok := s.cfg.GetData()[fileMark]; !ok {
+		return errors.New("file mark not found")
 	}
 
 	resp, err := s.httpRequests.Get(
 		s.cfg.GetServerAPI()+path,
 		requests.WithHeader(AuthHeader, s.cfg.GetToken()),
-		requests.WithPathParams(map[string]string{"id": id}),
-		requests.WithOutput(dir+"/"+userData.Mark),
+		requests.WithPathParams(map[string]string{"fileMark": fileMark}),
+		requests.WithOutput(dir+"/"+fileMark),
 	)
 
 	if err != nil {

@@ -149,7 +149,7 @@ func TestAddFileValidationFailed(t *testing.T) {
 					File:        strings.NewReader("test"),
 					FileName:    "test",
 					FileSize:    int64(100),
-					Mark:        "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Mark:        generateString(150),
 					Description: "test",
 				},
 			},
@@ -165,7 +165,7 @@ func TestAddFileValidationFailed(t *testing.T) {
 					FileName:    "test",
 					FileSize:    int64(100),
 					Mark:        "test",
-					Description: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Description: generateString(4000),
 				},
 			},
 			want: want{
@@ -199,11 +199,8 @@ func TestGetFile(t *testing.T) {
 	s := NewServices(store, fs, crypter, &settings)
 
 	ctx := context.Background()
-	userDataID := 1
 	decData := []byte("some data")
-	mark := "test"
-	description := "test"
-	dataType := "file"
+	fileMark := "test"
 
 	jsonData := []byte(`{"file_name":"test"}`)
 
@@ -236,13 +233,11 @@ func TestGetFile(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			store.EXPECT().GetUserData(ctx, userDataID, dataType).
-				Times(1).Return(decData, mark, description, nil)
-
+			store.EXPECT().GetFileUserData(ctx, fileMark).Times(1).Return(decData, nil)
 			crypter.EXPECT().DecryptData(decData).Times(1).Return(jsonData, nil)
 			fs.EXPECT().GetFile(ctx, "test").Times(1).Return(test.fsResponse.file, test.fsResponse.err)
 
-			resp, err := s.GetFile(ctx, userDataID)
+			resp, err := s.GetFile(ctx, fileMark)
 
 			if test.wantErr {
 				require.Error(t, err)
@@ -266,9 +261,8 @@ func TestGetFileDecryptDataFailed(t *testing.T) {
 	s := NewServices(store, fs, crypter, &settings)
 
 	ctx := context.Background()
-	userDataID := 1
-	dataType := "file"
 	decData := []byte("some data")
+	fileMark := "test"
 
 	type cResponse struct {
 		jsonData []byte
@@ -302,11 +296,11 @@ func TestGetFileDecryptDataFailed(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			store.EXPECT().GetUserData(ctx, userDataID, dataType).Times(1).Return(decData, "", "", nil)
+			store.EXPECT().GetFileUserData(ctx, fileMark).Times(1).Return(decData, nil)
 			crypter.EXPECT().DecryptData(gomock.Any()).Times(1).Return(test.cResponse.jsonData, test.cResponse.err)
 			fs.EXPECT().GetFile(ctx, gomock.Any()).Times(0)
 
-			_, err := s.GetFile(ctx, userDataID)
+			_, err := s.GetFile(ctx, fileMark)
 
 			require.Error(t, err)
 			assert.ErrorContains(t, err, test.errText)
@@ -325,8 +319,7 @@ func TestGetFileFailedStorage(t *testing.T) {
 	s := NewServices(store, fs, crypter, &settings)
 
 	ctx := context.Background()
-	userDataID := 1
-	dataType := "file"
+	fileMark := "test"
 
 	type sResponse struct {
 		err error
@@ -354,11 +347,11 @@ func TestGetFileFailedStorage(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			store.EXPECT().GetUserData(ctx, userDataID, dataType).Times(1).Return([]byte{}, "", "", test.sResponse.err)
+			store.EXPECT().GetFileUserData(ctx, fileMark).Times(1).Return([]byte{}, test.sResponse.err)
 			crypter.EXPECT().DecryptData(gomock.Any()).Times(0)
 			fs.EXPECT().GetFile(ctx, gomock.Any()).Times(0)
 
-			_, err := s.GetFile(ctx, userDataID)
+			_, err := s.GetFile(ctx, fileMark)
 
 			require.Error(t, err)
 			assert.ErrorContains(t, err, test.errText, test.sResponse.err.Error())

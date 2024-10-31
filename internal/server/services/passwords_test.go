@@ -143,7 +143,7 @@ func TestAddPasswordValidationFailed(t *testing.T) {
 				req: models.AddPasswordRequest{
 					Login:       "test",
 					Password:    "test",
-					Mark:        "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Mark:        generateString(150),
 					Description: "test",
 				},
 			},
@@ -158,7 +158,7 @@ func TestAddPasswordValidationFailed(t *testing.T) {
 					Login:       "test",
 					Password:    "test",
 					Mark:        "test",
-					Description: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
+					Description: generateString(4000),
 				},
 			},
 			want: want{

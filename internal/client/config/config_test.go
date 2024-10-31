@@ -33,6 +33,32 @@ func TestGetServerAPI(t *testing.T) {
 	})
 }
 
+func TestGetRequestRetry(t *testing.T) {
+	t.Run("get request retry", func(t *testing.T) {
+		cfgFile := ""
+		init := Initializer(&cfgFile)
+		init()
+
+		cfg := GetConfig()
+		result := cfg.GetRequestRetry()
+
+		assert.NotEmpty(t, result)
+	})
+}
+
+func TestGetRequestTimeout(t *testing.T) {
+	t.Run("get request timeout", func(t *testing.T) {
+		cfgFile := ""
+		init := Initializer(&cfgFile)
+		init()
+
+		cfg := GetConfig()
+		result := cfg.GetRequestTimeout()
+
+		assert.NotEmpty(t, result)
+	})
+}
+
 func TestUpdateToken(t *testing.T) {
 	t.Run("update token", func(t *testing.T) {
 		cfgFile := ""
@@ -61,6 +87,12 @@ func TestUpdateData(t *testing.T) {
 				Mark:        "test",
 				Description: "test",
 			},
+			{
+				ID:          1,
+				Type:        "file",
+				Mark:        "filetest",
+				Description: "test",
+			},
 		}
 
 		cfg := GetConfig()
@@ -71,21 +103,39 @@ func TestUpdateData(t *testing.T) {
 }
 
 func TestAddData(t *testing.T) {
-	t.Run("add data", func(t *testing.T) {
-		cfgFile := ""
-		init := Initializer(&cfgFile)
-		init()
+	cfgFile := ""
+	init := Initializer(&cfgFile)
+	init()
 
-		data := models.UserData{
-			ID:          1,
-			Type:        "text",
-			Mark:        "test",
-			Description: "test",
-		}
+	tests := []struct {
+		name string
+		data models.UserData
+	}{
+		{
+			name: "add text",
+			data: models.UserData{
+				ID:          1,
+				Type:        "text",
+				Mark:        "test",
+				Description: "test",
+			},
+		},
+		{
+			name: "add file",
+			data: models.UserData{
+				ID:          1,
+				Type:        "file",
+				Mark:        "filetest",
+				Description: "test",
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := GetConfig()
+			err := cfg.AddData(test.data)
 
-		cfg := GetConfig()
-		err := cfg.AddData(data)
-
-		require.NoError(t, err)
-	})
+			require.NoError(t, err)
+		})
+	}
 }

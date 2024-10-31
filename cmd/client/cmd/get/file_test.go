@@ -17,7 +17,7 @@ func TestGetFileCmd(t *testing.T) {
 
 	s := mocks.NewMockServicer(mockCtrl)
 
-	fileID := "1"
+	fileMark := "test"
 	dir := "."
 
 	type getFile struct {
@@ -31,7 +31,7 @@ func TestGetFileCmd(t *testing.T) {
 	}{
 		{
 			name: "get file success",
-			args: []string{"get", "file", fileID},
+			args: []string{"get", "file", fileMark},
 			getFile: getFile{
 				err: nil,
 			},
@@ -39,7 +39,7 @@ func TestGetFileCmd(t *testing.T) {
 		},
 		{
 			name: "get file failed",
-			args: []string{"get", "file", fileID},
+			args: []string{"get", "file", fileMark},
 			getFile: getFile{
 				err: errors.New("some error"),
 			},
@@ -48,7 +48,7 @@ func TestGetFileCmd(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			s.EXPECT().GetFile(fileID, dir).Times(1).Return(test.getFile.err)
+			s.EXPECT().GetFile(fileMark, dir).Times(1).Return(test.getFile.err)
 
 			cmd.RootCmd.SetArgs(test.args)
 
