@@ -1,0 +1,7 @@
+{
+  "server_address": "localhost:8081",
+  "db_uri": "postgresql://localhost:5432/goph_keeper",
+  "enable_https": true,
+  "secret_key": "12345",
+  "log_level": "INFO"
+}
